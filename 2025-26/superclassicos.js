@@ -1,0 +1,775 @@
+window.superclassicData = {
+  "blocks": [
+    {
+      "matches": [
+        {
+          "title": "Bayern de Munique x Chelsea",
+          "home_label": "Bayern de Munique (casa)",
+          "away_label": "Chelsea (visita)"
+        },
+        {
+          "title": "Barcelona x Paris Saint-Germain",
+          "home_label": "Barcelona (casa)",
+          "away_label": "Paris Saint-Germain (visita)"
+        },
+        {
+          "title": "Liverpool x Real Madrid",
+          "home_label": "Liverpool (casa)",
+          "away_label": "Real Madrid (visita)"
+        },
+        {
+          "title": "Paris Saint-Germain x Bayern de Munique",
+          "home_label": "Paris Saint-Germain (casa)",
+          "away_label": "Bayern de Munique (visita)"
+        },
+        {
+          "title": "Chelsea x Barcelona",
+          "home_label": "Chelsea (casa)",
+          "away_label": "Barcelona (visita)"
+        },
+        {
+          "title": "Real Madrid x Manchester City",
+          "home_label": "Real Madrid (casa)",
+          "away_label": "Manchester City (visita)"
+        }
+      ],
+      "submissions": [
+        {
+          "participant": "Felippe Leite",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "3",
+              "away": "3"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "2",
+              "away": "0"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "2",
+              "away": "1"
+            }
+          ]
+        },
+        {
+          "participant": "Serginho",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "2",
+              "away": "2"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "0",
+              "away": "1"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "2",
+              "away": "0"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "1",
+              "away": "0"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "2",
+              "away": "1"
+            }
+          ]
+        },
+        {
+          "participant": "Biel",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "3",
+              "away": "2"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "3",
+              "away": "2"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "2",
+              "away": "0"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "3",
+              "away": "2"
+            }
+          ]
+        },
+        {
+          "participant": "Michel",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "1",
+              "away": "3"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "1",
+              "away": "3"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "2"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "2",
+              "away": "0"
+            }
+          ]
+        },
+        {
+          "participant": "Gui Giron",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "2",
+              "away": "0"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "1",
+              "away": "1"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "2",
+              "away": "0"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "0"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "1",
+              "away": "0"
+            }
+          ]
+        },
+        {
+          "participant": "Rafinha",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "3",
+              "away": "2"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "1",
+              "away": "2"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "2",
+              "away": "2"
+            }
+          ]
+        },
+        {
+          "participant": "Enrico",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "1",
+              "away": "2"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "1",
+              "away": "1"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "2"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "1",
+              "away": "2"
+            }
+          ]
+        },
+        {
+          "participant": "Ranieri",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "3",
+              "away": "2"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "2",
+              "away": "3"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "2",
+              "away": "3"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "4",
+              "away": "2"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "3",
+              "away": "2"
+            }
+          ]
+        },
+        {
+          "participant": "Faber",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "1",
+              "away": "3"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "3",
+              "away": "2"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "1",
+              "away": "2"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "2"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "1",
+              "away": "3"
+            }
+          ]
+        },
+        {
+          "participant": "Victor",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "1",
+              "away": "2"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "2",
+              "away": "3"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "3",
+              "away": "1"
+            }
+          ]
+        },
+        {
+          "participant": "Dan",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "1",
+              "away": "3"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "2",
+              "away": "2"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "1",
+              "away": "3"
+            }
+          ]
+        },
+        {
+          "participant": "Scarpa",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "2",
+              "away": "0"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "1",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "1",
+              "away": "0"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "1",
+              "away": "2"
+            }
+          ]
+        },
+        {
+          "participant": "Deco",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "1",
+              "away": "2"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "2",
+              "away": "1"
+            }
+          ]
+        },
+        {
+          "participant": "Marcel",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "1",
+              "away": "1"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "2",
+              "away": "2"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "1",
+              "away": "2"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "2",
+              "away": "1"
+            }
+          ]
+        },
+        {
+          "participant": "Leo Raposo",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "1",
+              "away": "2"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "3",
+              "away": "2"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "0",
+              "away": "0"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "3",
+              "away": "1"
+            }
+          ]
+        },
+        {
+          "participant": "Feijão",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "1",
+              "away": "1"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "1",
+              "away": "1"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "1",
+              "away": "3"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "0",
+              "away": "2"
+            }
+          ]
+        },
+        {
+          "participant": "Leo Picca",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "3",
+              "away": "2"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "2",
+              "away": "2"
+            }
+          ]
+        },
+        {
+          "participant": "Muca",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "2",
+              "away": "2"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "2",
+              "away": "0"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "3",
+              "away": "2"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "1",
+              "away": "2"
+            }
+          ]
+        },
+        {
+          "participant": "Ivan",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "1",
+              "away": "2"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "1",
+              "away": "1"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "1",
+              "away": "1"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "1",
+              "away": "0"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "3",
+              "away": "2"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "2",
+              "away": "2"
+            }
+          ]
+        },
+        {
+          "participant": "Celsinho",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "2",
+              "away": "2"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "3",
+              "away": "2"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "1",
+              "away": "0"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "0",
+              "away": "0"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "2"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "0",
+              "away": "2"
+            }
+          ]
+        },
+        {
+          "participant": "Nanel",
+          "predictions": [
+            {
+              "title": "Bayern de Munique x Chelsea",
+              "home": "3",
+              "away": "1"
+            },
+            {
+              "title": "Barcelona x Paris Saint-Germain",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Liverpool x Real Madrid",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Paris Saint-Germain x Bayern de Munique",
+              "home": "2",
+              "away": "2"
+            },
+            {
+              "title": "Chelsea x Barcelona",
+              "home": "2",
+              "away": "1"
+            },
+            {
+              "title": "Real Madrid x Manchester City",
+              "home": "3",
+              "away": "1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
