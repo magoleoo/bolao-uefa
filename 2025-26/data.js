@@ -75,7 +75,7 @@ window.competitionSnapshot = {
 };
 
 window.quarterFinalsFormsConfig = {
-  csvUrl: "",
+  csvUrl: "./api/forms-quarter-finals.csv",
   submitUrl: "",
   fieldMap: {
     participant: "",
@@ -545,7 +545,7 @@ window.knockoutResults = [
     kickoff: "2026-04-07T16:00:00-03:00",
     homeTeam: "Sporting CP",
     awayTeam: "Arsenal",
-    scoreFinal: { home: null, away: null },
+    scoreFinal: { home: 0, away: 1 },
   },
   {
     id: "QF2",
@@ -554,7 +554,7 @@ window.knockoutResults = [
     kickoff: "2026-04-07T16:00:00-03:00",
     homeTeam: "Real Madrid",
     awayTeam: "Bayern München",
-    scoreFinal: { home: null, away: null },
+    scoreFinal: { home: 1, away: 2 },
   },
   {
     id: "QF3",
