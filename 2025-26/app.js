@@ -624,6 +624,36 @@ function extractQuarterFormsRows(rawRows) {
   );
 }
 
+function buildQuarterFormsPicksByFixtureKey() {
+  if (!Array.isArray(quarterFinalsFormsData) || !quarterFinalsFormsData.length) return new Map();
+  const rows = extractQuarterFormsRows(quarterFinalsFormsData);
+  if (!rows.length) return new Map();
+
+  const byFixtureKey = new Map();
+
+  const appendLegPicks = (homeTeam, awayTeam, homeField, awayField) => {
+    const fixtureKey = getSuperclassicFixtureKey(`${homeTeam} x ${awayTeam}`);
+    const picks = [];
+    rows.forEach((entry) => {
+      const home = parseIntegerScore(entry.row[homeField]);
+      const away = parseIntegerScore(entry.row[awayField]);
+      if (!Number.isFinite(home) || !Number.isFinite(away)) return;
+      picks.push({
+        participant: entry.participant,
+        pick: `${home}x${away}`,
+      });
+    });
+    byFixtureKey.set(fixtureKey, picks);
+  };
+
+  qrMatches.forEach((match) => {
+    appendLegPicks(match.home1, match.away1, `${match.id}_ida_home`, `${match.id}_ida_away`);
+    appendLegPicks(match.home2, match.away2, `${match.id}_volta_home`, `${match.id}_volta_away`);
+  });
+
+  return byFixtureKey;
+}
+
 function buildQuarterScoringContext() {
   const empty = {
     byParticipant: new Map(),
@@ -891,6 +921,7 @@ function buildAutomaticSuperclassicFixtures() {
   const fixturesByKey = new Map();
   const legacyLeaguePicksByMatch = buildLegacySuperclassicPicksByMatch();
   const legacyTitlesByMatch = buildLegacySuperclassicTitleIndex();
+  const quarterFormsPicksByFixtureKey = buildQuarterFormsPicksByFixtureKey();
   const officialScoreByTeams = new Map(
     (leaguePhaseResults || []).map((match) => [
       `${canonicalTeamKey(match.homeTeam)}::${canonicalTeamKey(match.awayTeam)}`,
@@ -950,6 +981,8 @@ function buildAutomaticSuperclassicFixtures() {
       const phasePicks = normalizeSuperclassicPicks(fixture.picks);
       const fallbackPicks =
         phaseKey === "LEAGUE" ? legacyLeaguePicksByMatch.get(titleKey) || [] : [];
+      const quarterFormsPicks =
+        phaseKey === "QUARTER" ? quarterFormsPicksByFixtureKey.get(titleKey) || [] : [];
 
       upsertFixture({
         phase: phaseKey,
@@ -961,7 +994,7 @@ function buildAutomaticSuperclassicFixtures() {
                 `${canonicalTeamKey(parsed.homeTeam)}::${canonicalTeamKey(parsed.awayTeam)}`
               ) || normalizeScoreToken(fixture.official)
             : normalizeScoreToken(fixture.official),
-        picks: mergeSuperclassicPicks(fallbackPicks, phasePicks),
+        picks: mergeSuperclassicPicks(fallbackPicks, quarterFormsPicks, phasePicks),
       });
     });
   });
@@ -971,6 +1004,7 @@ function buildAutomaticSuperclassicFixtures() {
     if (!isEligibleSuperclassicMatch(match.homeTeam, match.awayTeam)) return;
 
     const title = `${match.homeTeam} x ${match.awayTeam}`;
+    const titleKey = getSuperclassicFixtureKey(title);
     let phaseDetail = match.roundLabel || phaseRules[match.phase]?.label || match.phase;
     const roundLabelText = String(match.roundLabel || "");
     const legMatch = roundLabelText.match(/\b(ida|volta)\b/i);
@@ -988,7 +1022,10 @@ function buildAutomaticSuperclassicFixtures() {
       phaseDetail,
       title,
       official,
-      picks: [],
+      picks:
+        match.phase === "QUARTER"
+          ? mergeSuperclassicPicks(quarterFormsPicksByFixtureKey.get(titleKey) || [])
+          : [],
     });
   });
 
