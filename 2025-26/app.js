@@ -727,10 +727,15 @@ function buildQuarterScoringContext() {
       }
 
       if (predictedResult === officialResult) {
-        participantTotals.quarter += quarterScoringRules.result;
+        let resultPoints = quarterScoringRules.result;
+        if (isSuperclassic) {
+          participantTotals.superclassic += quarterScoringRules.result;
+          resultPoints *= 2;
+        }
+        participantTotals.quarter += resultPoints;
         legHits.push({
           participantKey: key,
-          pointsAwarded: quarterScoringRules.result,
+          pointsAwarded: resultPoints,
         });
       }
     });
@@ -1562,6 +1567,10 @@ function computePhaseScoringSnapshot({ useLiveOfficial = false } = {}) {
             }
           } else if (predictedTrend && predictedTrend === officialTrend) {
             pointsAwarded = rules.result;
+            if (isSuperclassicKnockout) {
+              superclassicBonus = rules.result;
+              pointsAwarded += superclassicBonus;
+            }
           }
         }
 

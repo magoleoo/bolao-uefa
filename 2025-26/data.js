@@ -760,7 +760,7 @@ window.rulesSections = [
   {
     title: "Regras especiais",
     items: [
-      "Superclássicos: o dobro da pontuação do placar exato em confrontos entre times elegíveis ao superclássico.",
+      "Superclássicos: o dobro da pontuação do placar exato e também da tendência em confrontos entre times elegíveis ao superclássico.",
       "A regra de superclássico vai somente até as quartas de final. Nas semifinais e na final ela não se aplica.",
       "Na 1ª fase, os placares dos superclássicos devem ser preenchidos no espaço dedicado da aba Superclássicos (separado da tendência da fase de liga).",
       "Hope Solo: quando apenas um participante é o único a acertar o jogo, seja no placar exato ou na tendência, a pontuação desse acerto é dobrada.",
