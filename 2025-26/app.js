@@ -3984,6 +3984,91 @@ function splitPredictionFixturesByLeg(fixtures) {
   return { idaFixtures, voltaFixtures };
 }
 
+function buildQuarterPredictionFixturesFromForms() {
+  if (!Array.isArray(quarterFinalsFormsData) || !quarterFinalsFormsData.length) return [];
+  const rows = extractQuarterFormsRows(quarterFinalsFormsData);
+  if (!rows.length) return [];
+
+  const fixtures = [];
+
+  qrMatches.forEach((match, index) => {
+    const legs = [
+      {
+        leg: "IDA",
+        matchday: "Quartas - ida",
+        homeTeam: match.home1,
+        awayTeam: match.away1,
+        fieldHome: `${match.id}_ida_home`,
+        fieldAway: `${match.id}_ida_away`,
+      },
+      {
+        leg: "VOLTA",
+        matchday: "Quartas - volta",
+        homeTeam: match.home2,
+        awayTeam: match.away2,
+        fieldHome: `${match.id}_volta_home`,
+        fieldAway: `${match.id}_volta_away`,
+      },
+    ];
+
+    legs.forEach((legData) => {
+      const officialMatch = findKnockoutMatchByTeams("QUARTER", legData.homeTeam, legData.awayTeam);
+      const officialHome = parseIntegerScore(officialMatch?.scoreFinal?.home);
+      const officialAway = parseIntegerScore(officialMatch?.scoreFinal?.away);
+      const official =
+        Number.isFinite(officialHome) && Number.isFinite(officialAway)
+          ? `${officialHome}x${officialAway}`
+          : "-";
+
+      const picks = [];
+      rows.forEach((entry) => {
+        const predictedHome = parseIntegerScore(entry.row[legData.fieldHome]);
+        const predictedAway = parseIntegerScore(entry.row[legData.fieldAway]);
+        if (!Number.isFinite(predictedHome) || !Number.isFinite(predictedAway)) return;
+        picks.push({
+          participant: entry.participant,
+          pick: `${predictedHome}x${predictedAway}`,
+          rank_value: "",
+        });
+      });
+
+      fixtures.push({
+        label: `${legData.homeTeam} x ${legData.awayTeam}`,
+        leg: legData.leg,
+        matchday: legData.matchday,
+        official,
+        picks,
+      });
+    });
+
+    const legMatches = [
+      findKnockoutMatchByTeams("QUARTER", match.home1, match.away1),
+      findKnockoutMatchByTeams("QUARTER", match.home2, match.away2),
+    ].filter(Boolean);
+    const qualified = legMatches.find((item) => item?.qualified)?.qualified || "-";
+
+    const classifiedPicks = [];
+    rows.forEach((entry) => {
+      const pick = String(entry.row[`${match.id}_classificado`] || "").trim();
+      if (!pick) return;
+      classifiedPicks.push({
+        participant: entry.participant,
+        pick,
+        rank_value: "",
+      });
+    });
+
+    fixtures.push({
+      label: `Classificado: ${match.home1} x ${match.away1}`,
+      matchday: `Confronto ${index + 1}`,
+      official: qualified,
+      picks: classifiedPicks,
+    });
+  });
+
+  return fixtures;
+}
+
 function buildPredictionMatrixSection(fixtures, sectionTitle = "") {
   const knownParticipants = participants.map((participant) => participant.name);
   const knownParticipantsKeys = new Set(knownParticipants.map((name) => normalizeText(name)));
@@ -4562,7 +4647,13 @@ function renderPredictionConsultation() {
       });
     }
   } else {
-    const rawFixtures = backtestData?.phases?.[activePredictionsPhase]?.fixtures || [];
+    let rawFixtures = backtestData?.phases?.[activePredictionsPhase]?.fixtures || [];
+    if (!rawFixtures.length && activePredictionsPhase === "QUARTER_FINALS") {
+      rawFixtures = backtestData?.phases?.QUARTER?.fixtures || [];
+    }
+    if (!rawFixtures.length && activePredictionsPhase === "QUARTER_FINALS") {
+      rawFixtures = buildQuarterPredictionFixturesFromForms();
+    }
     if (hasKnockoutClassifiedSubview) {
       srcFixtures =
         activePredictionsKnockoutView === KNOCKOUT_PREDICTIONS_VIEW_CLASSIFIED
