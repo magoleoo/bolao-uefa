@@ -3154,10 +3154,10 @@ function setActiveTab(tab) {
 }
 
 const qrMatches = [
-  { id: "Q1", home1: "Paris Saint-Germain", away1: "Liverpool", home2: "Liverpool", away2: "Paris Saint-Germain" },
+  { id: "Q1", home1: "Sporting CP", away1: "Arsenal", home2: "Arsenal", away2: "Sporting CP" },
   { id: "Q2", home1: "Real Madrid", away1: "Bayern München", home2: "Bayern München", away2: "Real Madrid" },
   { id: "Q3", home1: "Barcelona", away1: "Atlético de Madrid", home2: "Atlético de Madrid", away2: "Barcelona" },
-  { id: "Q4", home1: "Sporting CP", away1: "Arsenal", home2: "Arsenal", away2: "Sporting CP" }
+  { id: "Q4", home1: "Paris Saint-Germain", away1: "Liverpool", home2: "Liverpool", away2: "Paris Saint-Germain" }
 ];
 
 function loadQfDrafts() {
