@@ -4694,11 +4694,13 @@ function renderPredictionConsultation() {
     }
   } else {
     let rawFixtures = backtestData?.phases?.[activePredictionsPhase]?.fixtures || [];
-    if (!rawFixtures.length && activePredictionsPhase === "QUARTER_FINALS") {
-      rawFixtures = backtestData?.phases?.QUARTER?.fixtures || [];
-    }
-    if (!rawFixtures.length && activePredictionsPhase === "QUARTER_FINALS") {
-      rawFixtures = buildQuarterPredictionFixturesFromForms();
+    if (activePredictionsPhase === "QUARTER_FINALS") {
+      const quarterFixturesFromForms = buildQuarterPredictionFixturesFromForms();
+      if (quarterFixturesFromForms.length) {
+        rawFixtures = quarterFixturesFromForms;
+      } else if (!rawFixtures.length) {
+        rawFixtures = backtestData?.phases?.QUARTER?.fixtures || [];
+      }
     }
     if (hasKnockoutClassifiedSubview) {
       srcFixtures =
