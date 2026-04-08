@@ -563,7 +563,7 @@ window.knockoutResults = [
     kickoff: "2026-04-08T16:00:00-03:00",
     homeTeam: "Barcelona",
     awayTeam: "Atlético de Madrid",
-    scoreFinal: { home: null, away: null },
+    scoreFinal: { home: 0, away: 2 },
   },
   {
     id: "QF4",
@@ -572,7 +572,7 @@ window.knockoutResults = [
     kickoff: "2026-04-08T16:00:00-03:00",
     homeTeam: "Paris Saint-Germain",
     awayTeam: "Liverpool",
-    scoreFinal: { home: null, away: null },
+    scoreFinal: { home: 2, away: 0 },
   },
   {
     id: "QF5",
