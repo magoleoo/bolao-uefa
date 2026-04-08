@@ -523,6 +523,8 @@ const superclassicTeamAliases = {
   "bayern münchen": "bayern munchen",
   "bayern munchen": "bayern munchen",
   "bayern munich": "bayern munchen",
+  "sporting cp": "sporting",
+  sporting: "sporting",
   "atlético de madrid": "atletico de madrid",
   "atletico de madrid": "atletico de madrid",
   "paris saint-germain": "paris saint germain",
@@ -622,6 +624,54 @@ function extractQuarterFormsRows(rawRows) {
   return [...latestByParticipant.values()].sort((a, b) =>
     a.participant.localeCompare(b.participant, "pt-BR")
   );
+}
+
+function normalizeQuarterQualifiedTeam(value, match) {
+  const raw = String(value || "").trim();
+  if (!raw || !match) return "";
+  const key = canonicalTeamKey(raw);
+  if (key === canonicalTeamKey(match.home1) || key === canonicalTeamKey(match.home2)) {
+    return match.home1;
+  }
+  if (key === canonicalTeamKey(match.away1) || key === canonicalTeamKey(match.away2)) {
+    return match.away1;
+  }
+  return raw;
+}
+
+function resolveQuarterClassifiedPick(entry, match) {
+  if (!entry || !match) return "";
+
+  const explicitPick = normalizeQuarterQualifiedTeam(
+    entry.row?.[`${match.id}_classificado`],
+    match
+  );
+  if (explicitPick) return explicitPick;
+
+  const idaHome = parseIntegerScore(entry.row?.[`${match.id}_ida_home`]);
+  const idaAway = parseIntegerScore(entry.row?.[`${match.id}_ida_away`]);
+  const voltaHome = parseIntegerScore(entry.row?.[`${match.id}_volta_home`]);
+  const voltaAway = parseIntegerScore(entry.row?.[`${match.id}_volta_away`]);
+  if (
+    !Number.isFinite(idaHome) ||
+    !Number.isFinite(idaAway) ||
+    !Number.isFinite(voltaHome) ||
+    !Number.isFinite(voltaAway)
+  ) {
+    return "";
+  }
+
+  // match.home1 vs match.away1 (ida), then match.home2 (away1) vs match.away2 (home1) (volta)
+  const aggregateHome = idaHome + voltaAway;
+  const aggregateAway = idaAway + voltaHome;
+  if (aggregateHome > aggregateAway) return match.home1;
+  if (aggregateAway > aggregateHome) return match.away1;
+
+  // Fallback when aggregate ties and classificado field is missing: use second-leg winner.
+  const secondLegResult = matchResultFromScores(voltaHome, voltaAway);
+  if (secondLegResult === "HOME") return match.home2;
+  if (secondLegResult === "AWAY") return match.away2;
+  return "";
 }
 
 function buildQuarterFormsPicksByFixtureKey() {
@@ -760,9 +810,9 @@ function buildQuarterScoringContext() {
     rows.forEach((entry) => {
       const participantTotals = byParticipant.get(normalizeText(entry.participant));
       if (!participantTotals) return;
-      const predictedQualified = String(entry.row[`${match.id}_classificado`] || "").trim();
+      const predictedQualified = resolveQuarterClassifiedPick(entry, match);
       if (!predictedQualified) return;
-      if (compareNormalizedNames(predictedQualified, qualified)) {
+      if (canonicalTeamKey(predictedQualified) === canonicalTeamKey(qualified)) {
         participantTotals.quarter += quarterScoringRules.qualified;
       }
     });
@@ -3635,7 +3685,7 @@ function renderQuarterFinalsFormsPanel() {
                   <td><strong>${entry.participant || "Sem nome"}</strong></td>
                   <td style="white-space:nowrap">${entry.row[`${match.id}_ida_home`] || "-"} x ${entry.row[`${match.id}_ida_away`] || "-"}</td>
                   <td style="white-space:nowrap">${entry.row[`${match.id}_volta_home`] || "-"} x ${entry.row[`${match.id}_volta_away`] || "-"}</td>
-                  <td>${entry.row[`${match.id}_classificado`] || "-"}</td>
+                  <td>${resolveQuarterClassifiedPick(entry, match) || "-"}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -4095,7 +4145,7 @@ function buildQuarterPredictionFixturesFromForms() {
 
     const classifiedPicks = [];
     rows.forEach((entry) => {
-      const pick = String(entry.row[`${match.id}_classificado`] || "").trim();
+      const pick = resolveQuarterClassifiedPick(entry, match);
       if (!pick) return;
       classifiedPicks.push({
         participant: entry.participant,
@@ -4302,7 +4352,7 @@ function buildKnockoutClassificationMatrixSection(fixtures, phaseLabel = "") {
     const cells = columns.map((column) => {
       const value = column.picksByParticipant.get(participantKey) || "-";
       const hitType =
-        value !== "-" && normalizeText(value) === normalizeText(column.official)
+        value !== "-" && canonicalTeamKey(value) === canonicalTeamKey(column.official)
           ? "exact"
           : "";
       return { value, hitType };
