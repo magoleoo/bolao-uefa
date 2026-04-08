@@ -4607,20 +4607,60 @@ function setPredictionsExportFeedback(message, isSuccess = false) {
 }
 
 function exportPredictionsAsPdf() {
-  const canvas = buildPredictionExportCanvas(latestPredictionExportPayload);
-  if (!canvas) {
+  const basePayload = latestPredictionExportPayload;
+  const sections = Array.isArray(basePayload?.sections) ? basePayload.sections : [];
+  if (!sections.length) {
     setPredictionsExportFeedback("Nada para exportar nesta visão.");
     return;
   }
 
-  const imageUrl = canvas.toDataURL("image/png");
+  const safeTitle = String(basePayload.title || "Palpites");
+  const pageSections = sections.filter(
+    (section) => Array.isArray(section?.columns) && section.columns.length
+  );
+  if (!pageSections.length) {
+    setPredictionsExportFeedback("Nada para exportar nesta visão.");
+    return;
+  }
+
+  const pageImages = pageSections
+    .map((section) => {
+      const sectionTitle = String(section.sectionTitle || "").trim();
+      const pageTitle = sectionTitle ? `${safeTitle} — ${sectionTitle}` : safeTitle;
+      const canvas = buildPredictionExportCanvas({
+        title: pageTitle,
+        sections: [section],
+      });
+      if (!canvas) return null;
+      return {
+        title: pageTitle,
+        imageUrl: canvas.toDataURL("image/png"),
+      };
+    })
+    .filter(Boolean);
+
+  if (!pageImages.length) {
+    setPredictionsExportFeedback("Nada para exportar nesta visão.");
+    return;
+  }
+
   const printWindow = window.open("", "_blank");
   if (!printWindow) {
     setPredictionsExportFeedback("Libere pop-up do navegador para exportar em PDF.");
     return;
   }
 
-  const safeTitle = String(latestPredictionExportPayload.title || "Palpites");
+  const pagesHtml = pageImages
+    .map(
+      (page, index) => `
+        <main class="sheet sheet-page ${index < pageImages.length - 1 ? "has-page-break" : ""}">
+          <h1>${page.title}</h1>
+          <img src="${page.imageUrl}" alt="Tabela de palpites - página ${index + 1}" />
+        </main>
+      `
+    )
+    .join("");
+
   printWindow.document.write(`
     <!doctype html>
     <html lang="pt-BR">
@@ -4628,9 +4668,13 @@ function exportPredictionsAsPdf() {
         <meta charset="UTF-8" />
         <title>${safeTitle}</title>
         <style>
+          @page {
+            size: A4 landscape;
+            margin: 8mm;
+          }
           body {
             margin: 0;
-            padding: 24px;
+            padding: 12px;
             font-family: "Space Grotesk", Arial, sans-serif;
             background: linear-gradient(180deg, #1434d8 0%, #0b1ca6 34%, #060d62 72%, #040a42 100%);
             color: #f5f8ff;
@@ -4638,11 +4682,15 @@ function exportPredictionsAsPdf() {
           .sheet {
             border: 1px solid rgba(178, 201, 255, 0.24);
             border-radius: 18px;
-            padding: 16px;
+            padding: 12px;
             background: rgba(8, 26, 122, 0.72);
+            margin-bottom: 12px;
           }
-          h1 { margin: 0 0 8px; font-size: 20px; letter-spacing: .02em; }
-          p { margin: 0 0 14px; font-size: 12px; color: #c4d5ff; }
+          .sheet-page.has-page-break {
+            break-after: page;
+            page-break-after: always;
+          }
+          h1 { margin: 0 0 10px; font-size: 19px; letter-spacing: .02em; }
           img {
             width: 100%;
             height: auto;
@@ -4652,18 +4700,24 @@ function exportPredictionsAsPdf() {
           }
           @media print {
             body { padding: 0; background: #ffffff; }
-            .sheet { border: 0; border-radius: 0; background: #ffffff; padding: 0; }
-            h1, p { margin-left: 10mm; margin-right: 10mm; color: #111; }
+            .sheet {
+              border: 0;
+              border-radius: 0;
+              background: #ffffff;
+              padding: 0;
+              margin: 0;
+            }
+            .sheet-page.has-page-break {
+              break-after: page;
+              page-break-after: always;
+            }
+            h1 { margin: 0 0 4mm; color: #111; font-size: 14pt; }
             img { border: 0; border-radius: 0; background: #fff; }
           }
         </style>
       </head>
       <body>
-        <main class="sheet">
-          <h1>${safeTitle}</h1>
-          <p>Selecione "Salvar como PDF" na janela de impressão para baixar o arquivo.</p>
-          <img src="${imageUrl}" alt="Tabela de palpites" />
-        </main>
+        ${pagesHtml}
         <script>
           window.addEventListener("load", function () {
             setTimeout(function () { window.print(); }, 250);
