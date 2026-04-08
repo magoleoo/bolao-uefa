@@ -648,10 +648,12 @@ function normalizeQuarterQualifiedTeam(value, match) {
   const raw = String(value || "").trim();
   if (!raw || !match) return "";
   const key = canonicalTeamKey(raw);
-  if (key === canonicalTeamKey(match.home1) || key === canonicalTeamKey(match.home2)) {
+  // Tie teams are canonicalized using first-leg orientation:
+  // team A => home1 (also away2), team B => away1 (also home2).
+  if (key === canonicalTeamKey(match.home1) || key === canonicalTeamKey(match.away2)) {
     return match.home1;
   }
-  if (key === canonicalTeamKey(match.away1) || key === canonicalTeamKey(match.away2)) {
+  if (key === canonicalTeamKey(match.away1) || key === canonicalTeamKey(match.home2)) {
     return match.away1;
   }
   return raw;
@@ -686,8 +688,8 @@ function resolveQuarterClassifiedPick(entry, match) {
 
   // Fallback when aggregate ties and classificado field is missing: use second-leg winner.
   const secondLegResult = matchResultFromScores(voltaHome, voltaAway);
-  if (secondLegResult === "HOME") return match.home2;
-  if (secondLegResult === "AWAY") return match.away2;
+  if (secondLegResult === "HOME") return match.away1;
+  if (secondLegResult === "AWAY") return match.home1;
   return "";
 }
 
