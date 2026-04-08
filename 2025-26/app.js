@@ -4707,12 +4707,26 @@ function exportPredictionsAsPdf() {
               padding: 0;
               margin: 0;
             }
+            .sheet-page {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
             .sheet-page.has-page-break {
               break-after: page;
               page-break-after: always;
             }
-            h1 { margin: 0 0 4mm; color: #111; font-size: 14pt; }
-            img { border: 0; border-radius: 0; background: #fff; }
+            h1 { margin: 0 0 3mm; color: #111; font-size: 12pt; }
+            img {
+              border: 0;
+              border-radius: 0;
+              background: #fff;
+              display: block;
+              margin: 0 auto;
+              width: auto;
+              max-width: 100%;
+              height: auto;
+              max-height: 178mm;
+            }
           }
         </style>
       </head>
