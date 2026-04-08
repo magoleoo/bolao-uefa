@@ -1051,6 +1051,13 @@ table {
   white-space: nowrap;
 }
 
+#panel-ranking .dashboard-table td:nth-child(9),
+#panel-ranking .dashboard-table td:nth-child(10) {
+  width: 90px;
+  min-width: 90px;
+  white-space: nowrap;
+}
+
 .dashboard-table tbody tr:last-child td {
   border-bottom: none;
 }
@@ -1086,6 +1093,10 @@ thead th {
   height: 22px;
   border-radius: 999px;
   background: rgba(46, 96, 255, 0.26);
+}
+
+.target-mark {
+  background: rgba(255, 184, 0, 0.22);
 }
 
 .prize-mark {

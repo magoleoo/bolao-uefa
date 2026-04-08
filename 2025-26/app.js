@@ -849,6 +849,106 @@ function buildQuarterScoringContext() {
   };
 }
 
+function buildCravadasContext() {
+  const byParticipant = new Map(
+    participants.map((participant) => [normalizeText(participant.name), 0])
+  );
+
+  const incrementCravada = (participantName) => {
+    const key = normalizeText(String(participantName || ""));
+    if (!key) return;
+    byParticipant.set(key, (byParticipant.get(key) || 0) + 1);
+  };
+
+  const countExactFromFixture = (fixture, picks) => {
+    const officialScore = normalizeScoreToken(fixture?.official);
+    if (!officialScore) return;
+
+    const picksByParticipant = new Map();
+    (picks || []).forEach((pick) => {
+      const participantName = String(pick?.participant || "").trim();
+      if (!participantName) return;
+      const normalizedPick = normalizeScoreToken(pick?.pick);
+      if (!normalizedPick) return;
+      picksByParticipant.set(normalizeText(participantName), {
+        participantName,
+        pick: normalizedPick,
+      });
+    });
+
+    picksByParticipant.forEach((entry) => {
+      if (entry.pick === officialScore) {
+        incrementCravada(entry.participantName);
+      }
+    });
+  };
+
+  // 1) Superclássicos da 1ª fase (única fonte com placares nessa fase).
+  const leagueSuperclassicFixtures = buildAutomaticSuperclassicFixtures().filter(
+    (fixture) => fixture.phase === "LEAGUE"
+  );
+  leagueSuperclassicFixtures.forEach((fixture) => {
+    countExactFromFixture(fixture, fixture.picks || []);
+  });
+
+  // 2) Mata-mata regular (playoff, oitavas, semi e final), excluindo quartas
+  // pois quartas vêm da base oficial do Forms.
+  ["PLAYOFF", "ROUND_OF_16", "SEMI", "FINAL"].forEach((phaseKey) => {
+    const fixtures = backtestData?.phases?.[phaseKey]?.fixtures || [];
+    fixtures.forEach((fixture) => {
+      if (isPredictionClassificationFixture(fixture)) return;
+      countExactFromFixture(fixture, fixture.picks || []);
+    });
+  });
+
+  // 3) Quartas via Forms oficial (ida/volta já jogadas).
+  if (Array.isArray(quarterFinalsFormsData) && quarterFinalsFormsData.length) {
+    const rows = extractQuarterFormsRows(quarterFinalsFormsData);
+
+    qrMatches.forEach((match) => {
+      const legs = [
+        {
+          leg: "IDA",
+          homeTeam: match.home1,
+          awayTeam: match.away1,
+        },
+        {
+          leg: "VOLTA",
+          homeTeam: match.home2,
+          awayTeam: match.away2,
+        },
+      ];
+
+      legs.forEach((legData) => {
+        const officialMatch = findKnockoutMatchByTeams(
+          "QUARTER",
+          legData.homeTeam,
+          legData.awayTeam
+        );
+        const officialHome = parseIntegerScore(officialMatch?.scoreFinal?.home);
+        const officialAway = parseIntegerScore(officialMatch?.scoreFinal?.away);
+        if (!Number.isFinite(officialHome) || !Number.isFinite(officialAway)) return;
+
+        const officialScore = `${officialHome}x${officialAway}`;
+        const legFields = getQuarterLegFields(match.id, legData.leg);
+
+        rows.forEach((entry) => {
+          const predictedHome = parseIntegerScore(entry.row?.[legFields.home]);
+          const predictedAway = parseIntegerScore(entry.row?.[legFields.away]);
+          if (!Number.isFinite(predictedHome) || !Number.isFinite(predictedAway)) return;
+
+          const predictedScore = `${predictedHome}x${predictedAway}`;
+          if (predictedScore === officialScore) {
+            incrementCravada(entry.participant);
+          }
+        });
+      });
+    });
+  }
+
+  return { byParticipant };
+}
+
 const superclassicPhaseOrder = ["LEAGUE", "PLAYOFF", "ROUND_OF_16", "QUARTER"];
 const quarterScoringRules = {
   result: 1.44,
@@ -1797,6 +1897,7 @@ function getRankingRows() {
   if (!backtestData || !backtestData.ranking) return [];
 
   const quarterContext = buildQuarterScoringContext();
+  const cravadasContext = buildCravadasContext();
   const hasApiMatches =
     Array.isArray(window.apiMatchesData?.matches) &&
     window.apiMatchesData.matches.length > 0;
@@ -1825,6 +1926,7 @@ function getRankingRows() {
     const baselineScores =
       baselineSnapshot.byParticipant.get(participantKey) || createEmptyPhaseScoreRow();
     const liveScores = liveSnapshot.byParticipant.get(participantKey) || baselineScores;
+    const cravadas = cravadasContext.byParticipant.get(participantKey) || 0;
 
     const deltaFirstPhase = roundToTwo(liveScores.firstPhase - baselineScores.firstPhase);
     const deltaPlayoff = roundToTwo(liveScores.playoff - baselineScores.playoff);
@@ -1847,6 +1949,7 @@ function getRankingRows() {
       superclassic:
         row.superclassic_points + deltaSuperclassic + quarterAdd.superclassic,
       hopeSolo: row.hope_solo_hits + deltaHopeSolo + quarterAdd.hopeSolo,
+      cravadas,
       favoriteTeam: row.favorite_team || "-",
       championPick: resolveChampionPickFromRow(row) || "-",
       scorerPick: row.scorer_pick || "-",
@@ -2112,6 +2215,12 @@ function renderRanking(leaderboard) {
               <strong>${row.hopeSolo || 0}</strong>
             </span>
           </td>
+          <td>
+            <span class="hope-solo-cell cravadas-cell" title="Quantidade total de placares exatos cravados no torneio">
+              <span class="glove-mark target-mark" aria-hidden="true">🎯</span>
+              <strong>${row.cravadas || 0}</strong>
+            </span>
+          </td>
           <td>${row.favoriteTeam || "-"}</td>
           <td>${row.scorerPick || "-"}</td>
           <td>${row.assistPick || "-"}</td>
@@ -2145,6 +2254,7 @@ function renderRanking(leaderboard) {
             <div class="ranking-mobile-extra">
               <span><strong>Superclássico:</strong> ${formatPoints(row.superclassic)}</span>
               <span><strong>Hope Solo:</strong> 🧤 ${row.hopeSolo || 0}</span>
+              <span><strong>Cravadas:</strong> 🎯 ${row.cravadas || 0}</span>
             </div>
             <div class="ranking-mobile-picks">
               <span><strong>Time favorito:</strong> ${row.favoriteTeam || "-"}</span>
