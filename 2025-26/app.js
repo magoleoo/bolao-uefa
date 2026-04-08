@@ -4635,6 +4635,7 @@ function exportPredictionsAsPdf() {
       return {
         title: pageTitle,
         imageUrl: canvas.toDataURL("image/png"),
+        aspectRatio: canvas.height / canvas.width,
       };
     })
     .filter(Boolean);
@@ -4643,6 +4644,15 @@ function exportPredictionsAsPdf() {
     setPredictionsExportFeedback("Nada para exportar nesta visão.");
     return;
   }
+
+  // UX de impressão: tabelas "altas" (ex.: quartas ida/volta) ocupam melhor em retrato;
+  // tabelas "largas" continuam em paisagem.
+  const averageAspectRatio =
+    pageImages.reduce((sum, page) => sum + (Number(page.aspectRatio) || 0), 0) / pageImages.length;
+  const usePortrait = averageAspectRatio > 0.75;
+  const pageSize = usePortrait ? "A4 portrait" : "A4 landscape";
+  const printImageMaxHeight = usePortrait ? "262mm" : "178mm";
+  const printImageWidth = usePortrait ? "100%" : "auto";
 
   const printWindow = window.open("", "_blank");
   if (!printWindow) {
@@ -4669,8 +4679,8 @@ function exportPredictionsAsPdf() {
         <title>${safeTitle}</title>
         <style>
           @page {
-            size: A4 landscape;
-            margin: 8mm;
+            size: ${pageSize};
+            margin: 6mm;
           }
           body {
             margin: 0;
@@ -4722,10 +4732,10 @@ function exportPredictionsAsPdf() {
               background: #fff;
               display: block;
               margin: 0 auto;
-              width: auto;
+              width: ${printImageWidth};
               max-width: 100%;
               height: auto;
-              max-height: 178mm;
+              max-height: ${printImageMaxHeight};
             }
           }
         </style>
