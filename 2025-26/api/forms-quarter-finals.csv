@@ -1,22 +1,22 @@
 Timestamp,Participante,Q1_ida_home,Q1_ida_away,Q1_volta_home,Q1_volta_away,Q1_classificado,Q2_ida_home,Q2_ida_away,Q2_volta_home,Q2_volta_away,Q2_classificado,Q3_ida_home,Q3_ida_away,Q3_volta_home,Q3_volta_away,Q3_classificado,Q4_ida_home,Q4_ida_away,Q4_volta_home,Q4_volta_away,Q4_classificado
-19/03/2026 12:33:33,Faber,2,1,3,2,Arsenal,2,1,3,1,Bayern München,4,1,2,2,Barcelona,1,2,4,0,Liverpool
-19/03/2026 13:27:41,Victor,3,1,1,2,Arsenal,2,1,1,1,Real Madrid,3,1,1,2,Barcelona,2,2,3,1,Paris Saint-Germain
-19/03/2026 13:39:34,Nanel,3,1,2,1,Arsenal,3,2,2,1,Bayern München,3,2,3,3,Barcelona,2,2,3,1,Paris Saint-Germain
-19/03/2026 16:06:10,Felippe Leite,4,1,3,2,Arsenal,2,0,1,1,Real Madrid,3,0,2,4,Barcelona,1,2,3,0,Paris Saint-Germain
-30/03/2026 09:01:14,Ivan,2,1,1,2,Arsenal,3,0,3,1,Real Madrid,1,1,2,1,Barcelona,1,1,2,1,Liverpool
-31/03/2026 04:10:57,Ranieri,3,1,3,0,Arsenal,3,1,1,2,Real Madrid,2,0,2,1,Barcelona,1,0,2,1,Liverpool
-05/04/2026 17:55:27,Deco,3,1,2,2,Arsenal,2,1,2,1,Bayern München,2,1,1,1,Barcelona,0,2,2,0,Paris Saint-Germain
-06/04/2026 09:51:17,Michel,2,2,3,1,Arsenal,1,2,2,2,Bayern München,3,1,2,3,Barcelona,2,2,1,0,Liverpool
-06/04/2026 09:51:49,Biel,2,1,2,1,Arsenal,2,2,2,3,Real Madrid,2,0,1,1,Barcelona,1,2,2,0,Paris Saint-Germain
-06/04/2026 12:18:18,Feijão,3,1,1,1,Sporting,1,1,2,0,Bayern München,3,1,1,2,Barcelona,2,0,2,1,Paris Saint-Germain
-06/04/2026 13:09:07,Rafinha,3,0,1,2,Arsenal,2,1,2,2,Real Madrid,3,0,2,1,Barcelona,1,1,4,1,Paris Saint-Germain
-06/04/2026 15:41:58,Marcel,3,1,1,2,Arsenal,2,2,3,1,Bayern München,2,0,1,2,Barcelona,1,2,3,1,Paris Saint-Germain
-06/04/2026 15:44:27,Leo Raposo,4,1,2,2,Arsenal,1,2,3,2,Bayern München,1,0,2,2,Barcelona,1,0,2,0,Paris Saint-Germain
-06/04/2026 16:38:25,Celsinho,1,1,2,1,Sporting,1,2,2,1,Bayern München,3,0,2,2,Barcelona,1,0,0,0,Liverpool
-06/04/2026 17:37:37,Serginho,2,0,1,2,Arsenal,3,1,2,2,Real Madrid,2,0,1,0,Barcelona,0,2,3,0,Paris Saint-Germain
-06/04/2026 17:39:51,Scarpa,2,0,1,1,Arsenal,1,3,2,2,Bayern München,3,0,1,2,Barcelona,0,1,4,1,Paris Saint-Germain
-06/04/2026 18:10:58,Leo Picca,3,2,2,2,Arsenal,3,1,1,2,Real Madrid,2,1,2,1,Atlético de Madrid,0,2,3,1,Paris Saint-Germain
-06/04/2026 20:35:05,Muca,2,1,2,2,Arsenal,1,2,3,0,Bayern München,3,2,2,2,Barcelona,1,1,2,0,Paris Saint-Germain
-07/04/2026 03:34:02,Dan,2,1,2,0,Arsenal,3,1,2,2,Real Madrid,3,2,3,3,Barcelona,1,2,3,0,Liverpool
-07/04/2026 06:41:48,Gui Giron,2,0,0,2,Arsenal,1,0,2,0,Bayern München,2,0,0,1,Barcelona,0,1,2,0,Paris Saint-Germain
-07/04/2026 07:15:45,Enrico,3,1,2,1,Arsenal,2,2,1,1,Real Madrid,3,1,2,2,Barcelona,1,1,2,1,Paris Saint-Germain
+06/04/2026 09:51:49,Biel,1,2,2,0,Arsenal,2,2,2,3,Real Madrid,2,0,1,1,Barcelona,2,1,2,1,Paris Saint-Germain
+06/04/2026 16:38:25,Celsinho,1,0,0,0,Sporting,1,2,2,1,Bayern de Munique,3,0,2,2,Barcelona,1,1,2,1,Liverpool
+07/04/2026 03:34:02,Dan,1,2,3,0,Arsenal,3,1,2,2,Real Madrid,3,2,3,3,Barcelona,2,1,2,0,Liverpool
+05/04/2026 17:55:27,Deco,0,2,2,0,Arsenal,2,1,2,1,Bayern de Munique,2,1,1,1,Barcelona,3,1,2,2,Paris Saint-Germain
+07/04/2026 07:15:45,Enrico,1,1,2,1,Arsenal,2,2,1,1,Real Madrid,3,1,2,2,Barcelona,3,1,2,1,Paris Saint-Germain
+19/03/2026 12:33:33,Faber,1,2,4,0,Arsenal,2,1,3,1,Bayern de Munique,4,1,2,2,Barcelona,2,1,3,2,Liverpool
+06/04/2026 12:18:18,Feijão,2,0,2,1,Sporting,1,1,2,0,Bayern de Munique,3,1,1,2,Barcelona,3,1,1,1,Paris Saint-Germain
+19/03/2026 16:06:10,Felippe Leite,1,2,3,0,Arsenal,2,0,1,1,Real Madrid,3,0,2,4,Barcelona,4,1,3,2,Paris Saint-Germain
+07/04/2026 06:41:48,Gui Giron,0,1,2,0,Arsenal,1,0,2,0,Bayern de Munique,2,0,0,1,Barcelona,2,0,0,2,Paris Saint-Germain
+30/03/2026 09:01:14,Ivan,1,1,2,1,Arsenal,3,0,3,1,Real Madrid,1,1,2,1,Barcelona,2,1,1,2,Liverpool
+06/04/2026 18:10:58,Leo Picca,0,2,3,1,Arsenal,3,1,1,2,Real Madrid,2,1,2,1,Atlético de Madrid,3,2,2,2,Paris Saint-Germain
+06/04/2026 15:44:27,Leo Raposo,1,0,2,0,Arsenal,1,2,3,2,Bayern de Munique,1,0,2,2,Barcelona,4,1,2,2,Paris Saint-Germain
+06/04/2026 15:41:58,Marcel,1,2,3,1,Arsenal,2,2,3,1,Bayern de Munique,2,0,1,2,Barcelona,3,1,1,2,Paris Saint-Germain
+06/04/2026 09:51:17,Michel,2,2,1,0,Arsenal,1,2,2,2,Bayern de Munique,3,1,2,3,Barcelona,2,2,3,1,Liverpool
+06/04/2026 20:35:05,Muca,1,1,2,0,Arsenal,1,2,3,0,Bayern de Munique,3,2,2,2,Barcelona,2,1,2,2,Paris Saint-Germain
+19/03/2026 13:39:34,Nanel,2,2,3,1,Arsenal,3,2,2,1,Bayern de Munique,3,2,3,3,Barcelona,3,1,2,1,Paris Saint-Germain
+06/04/2026 13:09:07,Rafinha,1,1,4,1,Arsenal,2,1,2,2,Real Madrid,3,0,2,1,Barcelona,3,0,1,2,Paris Saint-Germain
+31/03/2026 04:10:57,Ranieri,1,0,2,1,Arsenal,3,1,1,2,Real Madrid,2,0,2,1,Barcelona,3,1,3,0,Liverpool
+06/04/2026 17:39:51,Scarpa,0,1,4,1,Arsenal,1,3,2,2,Bayern de Munique,3,0,1,2,Barcelona,2,0,1,1,Paris Saint-Germain
+06/04/2026 17:37:37,Serginho,0,2,3,0,Arsenal,3,1,2,2,Real Madrid,2,0,1,0,Barcelona,2,0,1,2,Paris Saint-Germain
+19/03/2026 13:27:41,Victor,2,2,3,1,Arsenal,2,1,1,1,Real Madrid,3,1,1,2,Barcelona,3,1,1,2,Paris Saint-Germain

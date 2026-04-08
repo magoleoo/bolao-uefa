@@ -626,6 +626,24 @@ function extractQuarterFormsRows(rawRows) {
   );
 }
 
+// Optional per-match leg-field overrides for non-standard CSV exports.
+const quarterFormsLegFieldOverrides = {};
+
+function getQuarterLegFields(matchId, leg) {
+  const normalizedLeg = String(leg || "IDA").toUpperCase() === "VOLTA" ? "VOLTA" : "IDA";
+  const override = quarterFormsLegFieldOverrides?.[matchId]?.[normalizedLeg];
+  if (override?.home && override?.away) {
+    return override;
+  }
+  return normalizedLeg === "VOLTA"
+    ? { home: `${matchId}_volta_home`, away: `${matchId}_volta_away` }
+    : { home: `${matchId}_ida_home`, away: `${matchId}_ida_away` };
+}
+
+function getQuarterClassifiedField(matchId) {
+  return `${matchId}_classificado`;
+}
+
 function normalizeQuarterQualifiedTeam(value, match) {
   const raw = String(value || "").trim();
   if (!raw || !match) return "";
@@ -642,16 +660,15 @@ function normalizeQuarterQualifiedTeam(value, match) {
 function resolveQuarterClassifiedPick(entry, match) {
   if (!entry || !match) return "";
 
-  const explicitPick = normalizeQuarterQualifiedTeam(
-    entry.row?.[`${match.id}_classificado`],
-    match
-  );
+  const explicitPick = normalizeQuarterQualifiedTeam(entry.row?.[getQuarterClassifiedField(match.id)], match);
   if (explicitPick) return explicitPick;
 
-  const idaHome = parseIntegerScore(entry.row?.[`${match.id}_ida_home`]);
-  const idaAway = parseIntegerScore(entry.row?.[`${match.id}_ida_away`]);
-  const voltaHome = parseIntegerScore(entry.row?.[`${match.id}_volta_home`]);
-  const voltaAway = parseIntegerScore(entry.row?.[`${match.id}_volta_away`]);
+  const idaFields = getQuarterLegFields(match.id, "IDA");
+  const voltaFields = getQuarterLegFields(match.id, "VOLTA");
+  const idaHome = parseIntegerScore(entry.row?.[idaFields.home]);
+  const idaAway = parseIntegerScore(entry.row?.[idaFields.away]);
+  const voltaHome = parseIntegerScore(entry.row?.[voltaFields.home]);
+  const voltaAway = parseIntegerScore(entry.row?.[voltaFields.away]);
   if (
     !Number.isFinite(idaHome) ||
     !Number.isFinite(idaAway) ||
@@ -697,8 +714,10 @@ function buildQuarterFormsPicksByFixtureKey() {
   };
 
   qrMatches.forEach((match) => {
-    appendLegPicks(match.home1, match.away1, `${match.id}_ida_home`, `${match.id}_ida_away`);
-    appendLegPicks(match.home2, match.away2, `${match.id}_volta_home`, `${match.id}_volta_away`);
+    const idaFields = getQuarterLegFields(match.id, "IDA");
+    const voltaFields = getQuarterLegFields(match.id, "VOLTA");
+    appendLegPicks(match.home1, match.away1, idaFields.home, idaFields.away);
+    appendLegPicks(match.home2, match.away2, voltaFields.home, voltaFields.away);
   });
 
   return byFixtureKey;
@@ -721,24 +740,28 @@ function buildQuarterScoringContext() {
     ])
   );
 
-  const quarterLegs = qrMatches.flatMap((match) => [
-    {
-      id: `${match.id}_IDA`,
-      sourceId: match.id,
-      fieldHome: `${match.id}_ida_home`,
-      fieldAway: `${match.id}_ida_away`,
-      homeTeam: match.home1,
-      awayTeam: match.away1,
-    },
-    {
-      id: `${match.id}_VOLTA`,
-      sourceId: match.id,
-      fieldHome: `${match.id}_volta_home`,
-      fieldAway: `${match.id}_volta_away`,
-      homeTeam: match.home2,
-      awayTeam: match.away2,
-    },
-  ]);
+  const quarterLegs = qrMatches.flatMap((match) => {
+    const idaFields = getQuarterLegFields(match.id, "IDA");
+    const voltaFields = getQuarterLegFields(match.id, "VOLTA");
+    return [
+      {
+        id: `${match.id}_IDA`,
+        sourceId: match.id,
+        fieldHome: idaFields.home,
+        fieldAway: idaFields.away,
+        homeTeam: match.home1,
+        awayTeam: match.away1,
+      },
+      {
+        id: `${match.id}_VOLTA`,
+        sourceId: match.id,
+        fieldHome: voltaFields.home,
+        fieldAway: voltaFields.away,
+        homeTeam: match.home2,
+        awayTeam: match.away2,
+      },
+    ];
+  });
 
   quarterLegs.forEach((leg) => {
     const officialMatch = findKnockoutMatchByTeams("QUARTER", leg.homeTeam, leg.awayTeam);
@@ -3683,8 +3706,8 @@ function renderQuarterFinalsFormsPanel() {
               ${rows.map((entry) => `
                 <tr>
                   <td><strong>${entry.participant || "Sem nome"}</strong></td>
-                  <td style="white-space:nowrap">${entry.row[`${match.id}_ida_home`] || "-"} x ${entry.row[`${match.id}_ida_away`] || "-"}</td>
-                  <td style="white-space:nowrap">${entry.row[`${match.id}_volta_home`] || "-"} x ${entry.row[`${match.id}_volta_away`] || "-"}</td>
+                  <td style="white-space:nowrap">${entry.row[getQuarterLegFields(match.id, "IDA").home] || "-"} x ${entry.row[getQuarterLegFields(match.id, "IDA").away] || "-"}</td>
+                  <td style="white-space:nowrap">${entry.row[getQuarterLegFields(match.id, "VOLTA").home] || "-"} x ${entry.row[getQuarterLegFields(match.id, "VOLTA").away] || "-"}</td>
                   <td>${resolveQuarterClassifiedPick(entry, match) || "-"}</td>
                 </tr>
               `).join('')}
@@ -4088,22 +4111,24 @@ function buildQuarterPredictionFixturesFromForms() {
   const fixtures = [];
 
   qrMatches.forEach((match, index) => {
+    const idaFields = getQuarterLegFields(match.id, "IDA");
+    const voltaFields = getQuarterLegFields(match.id, "VOLTA");
     const legs = [
       {
         leg: "IDA",
         matchday: "Quartas - ida",
         homeTeam: match.home1,
         awayTeam: match.away1,
-        fieldHome: `${match.id}_ida_home`,
-        fieldAway: `${match.id}_ida_away`,
+        fieldHome: idaFields.home,
+        fieldAway: idaFields.away,
       },
       {
         leg: "VOLTA",
         matchday: "Quartas - volta",
         homeTeam: match.home2,
         awayTeam: match.away2,
-        fieldHome: `${match.id}_volta_home`,
-        fieldAway: `${match.id}_volta_away`,
+        fieldHome: voltaFields.home,
+        fieldAway: voltaFields.away,
       },
     ];
 
