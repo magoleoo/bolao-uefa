@@ -853,6 +853,9 @@ function buildCravadasContext() {
   const byParticipant = new Map(
     participants.map((participant) => [normalizeText(participant.name), 0])
   );
+  const byParticipantMatches = new Map(
+    participants.map((participant) => [normalizeText(participant.name), []])
+  );
   const byParticipantByPhase = new Map(
     participants.map((participant) => [
       normalizeText(participant.name),
@@ -867,8 +870,36 @@ function buildCravadasContext() {
       },
     ])
   );
+  const phaseShortLabels = {
+    leagueSuperclassic: "1ª fase",
+    playoff: "Playoff",
+    roundOf16: "Oitavas",
+    quarter: "Quartas",
+    semi: "Semi",
+    final: "Final",
+  };
 
-  const incrementCravada = (participantName, phaseKey = "") => {
+  const buildCravadaMatchLabel = (
+    phaseKey,
+    fixture,
+    officialScoreOverride = "",
+    explicitLegToken = ""
+  ) => {
+    const teams = resolveFixtureTeams(fixture);
+    const legToken = explicitLegToken || getLegToken(fixture?.leg);
+    const phaseLabel = phaseShortLabels[phaseKey] || "Fase";
+    const fixtureLabel = teams
+      ? `${teams.homeTeam} x ${teams.awayTeam}`
+      : String(fixture?.label || "").trim();
+    const officialScore = officialScoreOverride || normalizeScoreToken(fixture?.official);
+    const parts = [phaseLabel];
+    if (legToken) parts.push(legToken);
+    if (fixtureLabel) parts.push(fixtureLabel);
+    if (officialScore) parts.push(officialScore);
+    return parts.join(" • ");
+  };
+
+  const incrementCravada = (participantName, phaseKey = "", matchLabel = "") => {
     const key = normalizeText(String(participantName || ""));
     if (!key) return;
     byParticipant.set(key, (byParticipant.get(key) || 0) + 1);
@@ -886,11 +917,19 @@ function buildCravadasContext() {
     }
     phaseTotals.total += 1;
     byParticipantByPhase.set(key, phaseTotals);
+    if (matchLabel) {
+      const matches = byParticipantMatches.get(key) || [];
+      if (!matches.includes(matchLabel)) {
+        matches.push(matchLabel);
+      }
+      byParticipantMatches.set(key, matches);
+    }
   };
 
   const countExactFromFixture = (fixture, picks, phaseKey = "") => {
     const officialScore = normalizeScoreToken(fixture?.official);
     if (!officialScore) return;
+    const matchLabel = buildCravadaMatchLabel(phaseKey, fixture, officialScore);
 
     const picksByParticipant = new Map();
     (picks || []).forEach((pick) => {
@@ -906,7 +945,7 @@ function buildCravadasContext() {
 
     picksByParticipant.forEach((entry) => {
       if (entry.pick === officialScore) {
-        incrementCravada(entry.participantName, phaseKey);
+        incrementCravada(entry.participantName, phaseKey, matchLabel);
       }
     });
   };
@@ -972,14 +1011,20 @@ function buildCravadasContext() {
 
           const predictedScore = `${predictedHome}x${predictedAway}`;
           if (predictedScore === officialScore) {
-            incrementCravada(entry.participant, "quarter");
+            const matchLabel = buildCravadaMatchLabel(
+              "quarter",
+              { label: `${legData.homeTeam} x ${legData.awayTeam}`, leg: legData.leg },
+              officialScore,
+              legData.leg
+            );
+            incrementCravada(entry.participant, "quarter", matchLabel);
           }
         });
       });
     });
   }
 
-  return { byParticipant, byParticipantByPhase };
+  return { byParticipant, byParticipantByPhase, byParticipantMatches };
 }
 
 const superclassicPhaseOrder = ["LEAGUE", "PLAYOFF", "ROUND_OF_16", "QUARTER"];
@@ -1960,6 +2005,8 @@ function getRankingRows() {
       baselineSnapshot.byParticipant.get(participantKey) || createEmptyPhaseScoreRow();
     const liveScores = liveSnapshot.byParticipant.get(participantKey) || baselineScores;
     const cravadas = cravadasContext.byParticipant.get(participantKey) || 0;
+    const cravadasGames =
+      cravadasContext.byParticipantMatches?.get(participantKey) || [];
 
     const deltaFirstPhase = roundToTwo(liveScores.firstPhase - baselineScores.firstPhase);
     const deltaPlayoff = roundToTwo(liveScores.playoff - baselineScores.playoff);
@@ -1984,6 +2031,7 @@ function getRankingRows() {
         row.superclassic_points + deltaSuperclassic + quarterAdd.superclassic,
       hopeSolo: row.hope_solo_hits + deltaHopeSolo + quarterAdd.hopeSolo,
       cravadas,
+      cravadasGames,
       favoriteTeam: row.favorite_team || "-",
       championPick: resolveChampionPickFromRow(row) || "-",
       scorerPick: row.scorer_pick || "-",
@@ -2227,8 +2275,18 @@ function renderRanking(leaderboard) {
   const hasQuarterRows = extractQuarterFormsRows(quarterFinalsFormsData || []).length > 0;
 
   rankingTable.innerHTML = leaderboard
-    .map(
-      (row) => `
+    .map((row) => {
+      const cravadasGames = Array.isArray(row.cravadasGames) ? row.cravadasGames : [];
+      const cravadasPreview = cravadasGames.length
+        ? (cravadasGames.length === 1 ? cravadasGames[0] : `${cravadasGames[0]} +${cravadasGames.length - 1}`)
+        : "Sem jogo cravado";
+      const cravadasTitle = (
+        cravadasGames.length
+          ? `Jogos cravados: ${cravadasGames.join(" | ")}`
+          : "Sem jogos cravados ainda."
+      ).replace(/"/g, "&quot;");
+
+      return `
         <tr class="${row.position <= 4 ? "row-award" : ""}">
           <td>${row.position}</td>
           <td>
@@ -2250,17 +2308,24 @@ function renderRanking(leaderboard) {
             </span>
           </td>
           <td>
-            <span class="hope-solo-cell cravadas-cell" title="Quantidade total de placares exatos cravados no torneio">
-              <span class="glove-mark target-mark" aria-hidden="true">🎯</span>
-              <strong>${row.cravadas || 0}</strong>
+            <span
+              class="hope-solo-cell cravadas-cell"
+              title="${cravadasTitle}"
+              aria-label="${cravadasTitle}"
+            >
+              <span class="cravadas-topline">
+                <span class="glove-mark target-mark" aria-hidden="true">🎯</span>
+                <strong>${row.cravadas || 0}</strong>
+              </span>
+              <small class="cravadas-preview">${cravadasPreview}</small>
             </span>
           </td>
           <td>${row.favoriteTeam || "-"}</td>
           <td>${row.scorerPick || "-"}</td>
           <td>${row.assistPick || "-"}</td>
         </tr>
-      `
-    )
+      `;
+    })
     .join("");
 
   if (rankingCards) {

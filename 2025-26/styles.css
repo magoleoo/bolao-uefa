@@ -1058,6 +1058,12 @@ table {
   white-space: nowrap;
 }
 
+#panel-ranking .dashboard-table td:nth-child(10) {
+  width: 220px;
+  min-width: 220px;
+  white-space: normal;
+}
+
 .dashboard-table tbody tr:last-child td {
   border-bottom: none;
 }
@@ -1097,6 +1103,28 @@ thead th {
 
 .target-mark {
   background: rgba(255, 184, 0, 0.22);
+}
+
+.cravadas-cell {
+  border-radius: 12px;
+  padding: 8px 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.cravadas-topline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cravadas-preview {
+  display: block;
+  line-height: 1.2;
+  font-size: 0.72rem;
+  color: #c4d7ff;
+  max-width: 190px;
 }
 
 .prize-mark {
