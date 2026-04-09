@@ -1946,6 +1946,7 @@ function getRankingRows() {
       playoff: row.playoff_points + deltaPlayoff,
       roundOf16: row.round_of_16_points + deltaRoundOf16,
       quarter: quarterAdd.quarter,
+      superclassicLeaguePhase: row.superclassic_points,
       superclassic:
         row.superclassic_points + deltaSuperclassic + quarterAdd.superclassic,
       hopeSolo: row.hope_solo_hits + deltaHopeSolo + quarterAdd.hopeSolo,
@@ -2208,7 +2209,7 @@ function renderRanking(leaderboard) {
           <td>${formatPoints(row.playoff)}</td>
           <td>${formatPoints(row.roundOf16)}</td>
           <td>${hasQuarterRows ? formatPoints(row.quarter || 0) : ""}</td>
-          <td>${formatPoints(row.superclassic)}</td>
+          <td>${formatPoints(row.superclassicLeaguePhase ?? row.superclassic)}</td>
           <td>
             <span class="hope-solo-cell" title="Quantidade de placares exatos solitários identificados no backtest">
               <span class="glove-mark" aria-hidden="true">🧤</span>
@@ -2252,7 +2253,7 @@ function renderRanking(leaderboard) {
               <span><strong>Quartas</strong>${quarterValue}</span>
             </div>
             <div class="ranking-mobile-extra">
-              <span><strong>Superclássico:</strong> ${formatPoints(row.superclassic)}</span>
+              <span><strong>Superclássico (1ª fase):</strong> ${formatPoints(row.superclassicLeaguePhase ?? row.superclassic)}</span>
               <span><strong>Hope Solo:</strong> 🧤 ${row.hopeSolo || 0}</span>
               <span><strong>Cravadas:</strong> 🎯 ${row.cravadas || 0}</span>
             </div>
