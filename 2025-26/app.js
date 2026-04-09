@@ -2005,8 +2005,6 @@ function getRankingRows() {
       baselineSnapshot.byParticipant.get(participantKey) || createEmptyPhaseScoreRow();
     const liveScores = liveSnapshot.byParticipant.get(participantKey) || baselineScores;
     const cravadas = cravadasContext.byParticipant.get(participantKey) || 0;
-    const cravadasGames =
-      cravadasContext.byParticipantMatches?.get(participantKey) || [];
 
     const deltaFirstPhase = roundToTwo(liveScores.firstPhase - baselineScores.firstPhase);
     const deltaPlayoff = roundToTwo(liveScores.playoff - baselineScores.playoff);
@@ -2031,7 +2029,6 @@ function getRankingRows() {
         row.superclassic_points + deltaSuperclassic + quarterAdd.superclassic,
       hopeSolo: row.hope_solo_hits + deltaHopeSolo + quarterAdd.hopeSolo,
       cravadas,
-      cravadasGames,
       favoriteTeam: row.favorite_team || "-",
       championPick: resolveChampionPickFromRow(row) || "-",
       scorerPick: row.scorer_pick || "-",
@@ -2275,18 +2272,8 @@ function renderRanking(leaderboard) {
   const hasQuarterRows = extractQuarterFormsRows(quarterFinalsFormsData || []).length > 0;
 
   rankingTable.innerHTML = leaderboard
-    .map((row) => {
-      const cravadasGames = Array.isArray(row.cravadasGames) ? row.cravadasGames : [];
-      const cravadasPreview = cravadasGames.length
-        ? (cravadasGames.length === 1 ? cravadasGames[0] : `${cravadasGames[0]} +${cravadasGames.length - 1}`)
-        : "Sem jogo cravado";
-      const cravadasTitle = (
-        cravadasGames.length
-          ? `Jogos cravados: ${cravadasGames.join(" | ")}`
-          : "Sem jogos cravados ainda."
-      ).replace(/"/g, "&quot;");
-
-      return `
+    .map(
+      (row) => `
         <tr class="${row.position <= 4 ? "row-award" : ""}">
           <td>${row.position}</td>
           <td>
@@ -2308,24 +2295,17 @@ function renderRanking(leaderboard) {
             </span>
           </td>
           <td>
-            <span
-              class="hope-solo-cell cravadas-cell"
-              title="${cravadasTitle}"
-              aria-label="${cravadasTitle}"
-            >
-              <span class="cravadas-topline">
-                <span class="glove-mark target-mark" aria-hidden="true">🎯</span>
-                <strong>${row.cravadas || 0}</strong>
-              </span>
-              <small class="cravadas-preview">${cravadasPreview}</small>
+            <span class="hope-solo-cell cravadas-cell" title="Quantidade total de placares exatos cravados no torneio">
+              <span class="glove-mark target-mark" aria-hidden="true">🎯</span>
+              <strong>${row.cravadas || 0}</strong>
             </span>
           </td>
           <td>${row.favoriteTeam || "-"}</td>
           <td>${row.scorerPick || "-"}</td>
           <td>${row.assistPick || "-"}</td>
         </tr>
-      `;
-    })
+      `
+    )
     .join("");
 
   if (rankingCards) {
@@ -4615,6 +4595,7 @@ function buildKnockoutClassificationMatrixSection(fixtures, phaseLabel = "") {
 function buildCravadasSummaryMatrixSection() {
   const cravadasContext = buildCravadasContext();
   const byPhase = cravadasContext.byParticipantByPhase || new Map();
+  const byMatches = cravadasContext.byParticipantMatches || new Map();
   const fallbackRow = {
     leagueSuperclassic: 0,
     playoff: 0,
@@ -4624,6 +4605,12 @@ function buildCravadasSummaryMatrixSection() {
     final: 0,
     total: 0,
   };
+  const escapeHtml = (value) =>
+    String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  const escapeAttr = (value) => escapeHtml(value).replace(/"/g, "&quot;");
 
   const columns = [
     { subtitle: "Cravadas", label: "Superclássico (1ª fase)", official: "-" },
@@ -4633,11 +4620,24 @@ function buildCravadasSummaryMatrixSection() {
     { subtitle: "Cravadas", label: "Semi", official: "-" },
     { subtitle: "Cravadas", label: "Final", official: "-" },
     { subtitle: "Consolidado", label: "Total", official: "-" },
+    { subtitle: "Consolidado", label: "Jogos cravados", official: "-" },
   ];
 
   const rows = participants.map((participant) => {
     const participantKey = normalizeText(participant.name);
     const totals = byPhase.get(participantKey) || fallbackRow;
+    const matchList = byMatches.get(participantKey) || [];
+    const gamesPreview = matchList.length
+      ? (matchList.length <= 2
+          ? matchList.join(" • ")
+          : `${matchList[0]} • ${matchList[1]} • +${matchList.length - 2}`)
+      : "-";
+    const gamesTitle = matchList.length
+      ? `Jogos cravados: ${matchList.join(" | ")}`
+      : "Sem jogos cravados ainda.";
+    const gamesCellValue = matchList.length
+      ? `<span class="result-chip exact" title="${escapeAttr(gamesTitle)}">${escapeHtml(gamesPreview)}</span>`
+      : "-";
     const cells = [
       { value: String(totals.leagueSuperclassic ?? 0), hitType: "" },
       { value: String(totals.playoff ?? 0), hitType: "" },
@@ -4646,6 +4646,7 @@ function buildCravadasSummaryMatrixSection() {
       { value: String(totals.semi ?? 0), hitType: "" },
       { value: String(totals.final ?? 0), hitType: "" },
       { value: String(totals.total ?? 0), hitType: "" },
+      { value: gamesCellValue, hitType: "" },
     ];
     return {
       participantName: participant.name,
