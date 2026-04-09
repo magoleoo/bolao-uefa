@@ -853,14 +853,42 @@ function buildCravadasContext() {
   const byParticipant = new Map(
     participants.map((participant) => [normalizeText(participant.name), 0])
   );
+  const byParticipantByPhase = new Map(
+    participants.map((participant) => [
+      normalizeText(participant.name),
+      {
+        leagueSuperclassic: 0,
+        playoff: 0,
+        roundOf16: 0,
+        quarter: 0,
+        semi: 0,
+        final: 0,
+        total: 0,
+      },
+    ])
+  );
 
-  const incrementCravada = (participantName) => {
+  const incrementCravada = (participantName, phaseKey = "") => {
     const key = normalizeText(String(participantName || ""));
     if (!key) return;
     byParticipant.set(key, (byParticipant.get(key) || 0) + 1);
+    const phaseTotals = byParticipantByPhase.get(key) || {
+      leagueSuperclassic: 0,
+      playoff: 0,
+      roundOf16: 0,
+      quarter: 0,
+      semi: 0,
+      final: 0,
+      total: 0,
+    };
+    if (phaseKey && Object.prototype.hasOwnProperty.call(phaseTotals, phaseKey)) {
+      phaseTotals[phaseKey] += 1;
+    }
+    phaseTotals.total += 1;
+    byParticipantByPhase.set(key, phaseTotals);
   };
 
-  const countExactFromFixture = (fixture, picks) => {
+  const countExactFromFixture = (fixture, picks, phaseKey = "") => {
     const officialScore = normalizeScoreToken(fixture?.official);
     if (!officialScore) return;
 
@@ -878,7 +906,7 @@ function buildCravadasContext() {
 
     picksByParticipant.forEach((entry) => {
       if (entry.pick === officialScore) {
-        incrementCravada(entry.participantName);
+        incrementCravada(entry.participantName, phaseKey);
       }
     });
   };
@@ -888,16 +916,21 @@ function buildCravadasContext() {
     (fixture) => fixture.phase === "LEAGUE"
   );
   leagueSuperclassicFixtures.forEach((fixture) => {
-    countExactFromFixture(fixture, fixture.picks || []);
+    countExactFromFixture(fixture, fixture.picks || [], "leagueSuperclassic");
   });
 
   // 2) Mata-mata regular (playoff, oitavas, semi e final), excluindo quartas
   // pois quartas vêm da base oficial do Forms.
-  ["PLAYOFF", "ROUND_OF_16", "SEMI", "FINAL"].forEach((phaseKey) => {
-    const fixtures = backtestData?.phases?.[phaseKey]?.fixtures || [];
+  [
+    { phaseId: "PLAYOFF", phaseKey: "playoff" },
+    { phaseId: "ROUND_OF_16", phaseKey: "roundOf16" },
+    { phaseId: "SEMI", phaseKey: "semi" },
+    { phaseId: "FINAL", phaseKey: "final" },
+  ].forEach(({ phaseId, phaseKey }) => {
+    const fixtures = backtestData?.phases?.[phaseId]?.fixtures || [];
     fixtures.forEach((fixture) => {
       if (isPredictionClassificationFixture(fixture)) return;
-      countExactFromFixture(fixture, fixture.picks || []);
+      countExactFromFixture(fixture, fixture.picks || [], phaseKey);
     });
   });
 
@@ -939,14 +972,14 @@ function buildCravadasContext() {
 
           const predictedScore = `${predictedHome}x${predictedAway}`;
           if (predictedScore === officialScore) {
-            incrementCravada(entry.participant);
+            incrementCravada(entry.participant, "quarter");
           }
         });
       });
     });
   }
 
-  return { byParticipant };
+  return { byParticipant, byParticipantByPhase };
 }
 
 const superclassicPhaseOrder = ["LEAGUE", "PLAYOFF", "ROUND_OF_16", "QUARTER"];
@@ -4514,6 +4547,55 @@ function buildKnockoutClassificationMatrixSection(fixtures, phaseLabel = "") {
   };
 }
 
+function buildCravadasSummaryMatrixSection() {
+  const cravadasContext = buildCravadasContext();
+  const byPhase = cravadasContext.byParticipantByPhase || new Map();
+  const fallbackRow = {
+    leagueSuperclassic: 0,
+    playoff: 0,
+    roundOf16: 0,
+    quarter: 0,
+    semi: 0,
+    final: 0,
+    total: 0,
+  };
+
+  const columns = [
+    { subtitle: "Cravadas", label: "Superclássico (1ª fase)", official: "-" },
+    { subtitle: "Cravadas", label: "Playoff", official: "-" },
+    { subtitle: "Cravadas", label: "Oitavas", official: "-" },
+    { subtitle: "Cravadas", label: "Quartas", official: "-" },
+    { subtitle: "Cravadas", label: "Semi", official: "-" },
+    { subtitle: "Cravadas", label: "Final", official: "-" },
+    { subtitle: "Consolidado", label: "Total", official: "-" },
+  ];
+
+  const rows = participants.map((participant) => {
+    const participantKey = normalizeText(participant.name);
+    const totals = byPhase.get(participantKey) || fallbackRow;
+    const cells = [
+      { value: String(totals.leagueSuperclassic ?? 0), hitType: "" },
+      { value: String(totals.playoff ?? 0), hitType: "" },
+      { value: String(totals.roundOf16 ?? 0), hitType: "" },
+      { value: String(totals.quarter ?? 0), hitType: "" },
+      { value: String(totals.semi ?? 0), hitType: "" },
+      { value: String(totals.final ?? 0), hitType: "" },
+      { value: String(totals.total ?? 0), hitType: "" },
+    ];
+    return {
+      participantName: participant.name,
+      cells,
+    };
+  });
+
+  return {
+    sectionTitle: "Cravadas por participante",
+    columns,
+    rows,
+    disableMobileBoard: true,
+  };
+}
+
 function drawWrappedCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3) {
   const words = String(text || "").split(/\s+/).filter(Boolean);
   if (!words.length) return 0;
@@ -4875,7 +4957,8 @@ function renderPredictionConsultation() {
     { id: "ROUND_OF_16", label: "Oitavas" },
     { id: "QUARTER_FINALS", label: "Quartas" },
     { id: "SEMI_FINALS", label: "Semis" },
-    { id: "FINAL", label: "Final" }
+    { id: "FINAL", label: "Final" },
+    { id: "CRAVADAS", label: "Cravadas" },
   ];
 
   const leagueRounds = Array.from({ length: 8 }, (_, i) => `Matchday ${i + 1}`);
@@ -4886,6 +4969,7 @@ function renderPredictionConsultation() {
     "SEMI_FINALS",
   ]);
   const hasKnockoutClassifiedSubview = phasesWithClassifiedSubview.has(activePredictionsPhase);
+  const isCravadasView = activePredictionsPhase === "CRAVADAS";
 
   let phaseTabsHTML = `<div class="predictions-subtabs predictions-subtabs--framed">`;
   validPhases.forEach(ph => {
@@ -4944,7 +5028,9 @@ function renderPredictionConsultation() {
   }
 
   let srcFixtures = [];
-  if (activePredictionsPhase === "LEAGUE") {
+  if (isCravadasView) {
+    srcFixtures = [];
+  } else if (activePredictionsPhase === "LEAGUE") {
     const rawMatches = backtestData?.phases?.[activePredictionsPhase]?.fixtures || [];
     if (activePredictionsFilter === PREDICTIONS_FILTER_CLASSIFIED) {
       srcFixtures = rawMatches.filter((fixture) => isPredictionClassificationFixture(fixture));
@@ -4980,7 +5066,9 @@ function renderPredictionConsultation() {
 
   const activePhaseMeta = validPhases.find((phase) => phase.id === activePredictionsPhase);
   const exportTitle =
-    activePredictionsPhase === "LEAGUE"
+    isCravadasView
+      ? "Cravadas por participante"
+      : activePredictionsPhase === "LEAGUE"
       ? (
         activePredictionsFilter === PREDICTIONS_FILTER_CLASSIFIED
           ? `Palpites ${activePhaseMeta?.label || "Primeira Fase"} - Classificados`
@@ -4993,7 +5081,9 @@ function renderPredictionConsultation() {
 
   let matrixSections = [];
   const phasesWithTwoLegs = ["PLAYOFF", "ROUND_OF_16", "QUARTER_FINALS", "SEMI_FINALS"];
-  if (srcFixtures.length) {
+  if (isCravadasView) {
+    matrixSections = [buildCravadasSummaryMatrixSection()];
+  } else if (srcFixtures.length) {
     if (activePredictionsPhase === "LEAGUE" && activePredictionsFilter === PREDICTIONS_FILTER_CLASSIFIED) {
       matrixSections = [buildLeagueClassificationMatrixSection(srcFixtures)];
     } else if (
@@ -5037,12 +5127,14 @@ function renderPredictionConsultation() {
   `;
 
   const emptyStateMessage =
-    hasKnockoutClassifiedSubview &&
+    isCravadasView
+      ? "Nenhuma cravada registrada ainda."
+      : hasKnockoutClassifiedSubview &&
     activePredictionsKnockoutView === KNOCKOUT_PREDICTIONS_VIEW_CLASSIFIED
       ? "Nenhum palpite de classificados registrado nesta etapa ainda."
       : "Nenhum palpite registrado nesta etapa ainda.";
 
-  if (!srcFixtures.length) {
+  if (!matrixSections.length) {
     container.innerHTML =
       phaseTabsHTML +
       secondaryTabsHTML +
@@ -5125,6 +5217,10 @@ function renderPredictionConsultation() {
           </table>
         </div>
 
+        ${
+          section.disableMobileBoard
+            ? ""
+            : `
         <div class="predictions-mobile-board">
           ${section.columns
             .map((column, columnIndex) => {
@@ -5220,6 +5316,8 @@ function renderPredictionConsultation() {
             })
             .join("")}
         </div>
+        `
+        }
       </section>
     `;
   };
