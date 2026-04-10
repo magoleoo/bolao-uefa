@@ -4651,6 +4651,7 @@ function buildCravadasSummaryMatrixSection() {
     return {
       participantName: participant.name,
       cells,
+      gamesFullList: matchList,
     };
   });
 
@@ -5243,7 +5244,11 @@ function renderPredictionConsultation() {
       return `
         <div class="predictions-mobile-board predictions-mobile-board--cravadas">
           ${section.rows
-            .map((row) => `
+            .map((row) => {
+              const fullGames = Array.isArray(row.gamesFullList)
+                ? row.gamesFullList.filter(Boolean)
+                : [];
+              return `
               <article class="prediction-mobile-match cravadas-mobile-card">
                 <header class="prediction-mobile-head">
                   <p class="eyebrow">Cravadas</p>
@@ -5258,11 +5263,23 @@ function renderPredictionConsultation() {
                     `)
                     .join("")}
                 </div>
-                <p class="cravadas-mobile-games">
-                  <strong>Jogos:</strong> ${toPlainText(row.cells[gamesIndex]?.value || "-")}
-                </p>
+                ${
+                  fullGames.length
+                    ? `
+                      <div class="cravadas-mobile-games">
+                        <strong>Jogos cravados (${fullGames.length}):</strong>
+                        <ul class="cravadas-mobile-list">
+                          ${fullGames
+                            .map((game) => `<li>${game}</li>`)
+                            .join("")}
+                        </ul>
+                      </div>
+                    `
+                    : `<p class="cravadas-mobile-games"><strong>Jogos cravados:</strong> -</p>`
+                }
               </article>
-            `)
+            `;
+            })
             .join("")}
         </div>
       `;

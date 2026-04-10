@@ -669,6 +669,17 @@ select {
   color: #d9e8ff;
 }
 
+.cravadas-mobile-list {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+.cravadas-mobile-list li {
+  line-height: 1.35;
+}
+
 .prediction-mobile-match {
   border: 1px solid var(--line);
   border-radius: 16px;
