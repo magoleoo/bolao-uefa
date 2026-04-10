@@ -654,6 +654,21 @@ select {
   gap: 12px;
 }
 
+.cravadas-mobile-card .prediction-mobile-stats {
+  gap: 6px;
+}
+
+.cravadas-mobile-card .prediction-mobile-stat {
+  text-transform: none;
+}
+
+.cravadas-mobile-games {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: #d9e8ff;
+}
+
 .prediction-mobile-match {
   border: 1px solid var(--line);
   border-radius: 16px;

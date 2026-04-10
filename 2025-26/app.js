@@ -4658,7 +4658,7 @@ function buildCravadasSummaryMatrixSection() {
     sectionTitle: "Cravadas por participante",
     columns,
     rows,
-    disableMobileBoard: true,
+    mobileVariant: "cravadas-participants",
   };
 }
 
@@ -5221,6 +5221,52 @@ function renderPredictionConsultation() {
     const trendStatLabel = section.mobileStatLabels?.trend || "tendência(s)";
     const emptyHitLabel =
       section.mobileEmptyLabel || "Ninguém acertou placar exato ou tendência neste jogo.";
+    const toPlainText = (value) =>
+      String(value || "-")
+        .replace(/<[^>]*>/g, "")
+        .replace(/\s+/g, " ")
+        .trim() || "-";
+    const compactCravadasLabel = (value) => {
+      const label = String(value || "").toLowerCase();
+      if (label.includes("superclassico") || label.includes("superclássico")) return "1ª fase";
+      if (label.includes("playoff")) return "Playoff";
+      if (label.includes("oitavas")) return "Oitavas";
+      if (label.includes("quartas")) return "Quartas";
+      if (label.includes("semi")) return "Semi";
+      if (label.includes("final")) return "Final";
+      if (label.includes("total")) return "Total";
+      return String(value || "-");
+    };
+    const renderCravadasMobileCards = () => {
+      const gamesIndex = section.columns.length - 1;
+      const metricColumns = section.columns.slice(0, gamesIndex);
+      return `
+        <div class="predictions-mobile-board predictions-mobile-board--cravadas">
+          ${section.rows
+            .map((row) => `
+              <article class="prediction-mobile-match cravadas-mobile-card">
+                <header class="prediction-mobile-head">
+                  <p class="eyebrow">Cravadas</p>
+                  <strong>${row.participantName}</strong>
+                </header>
+                <div class="prediction-mobile-stats">
+                  ${metricColumns
+                    .map((column, columnIndex) => `
+                      <span class="prediction-mobile-stat neutral">
+                        <strong>${compactCravadasLabel(column.label)}</strong>: ${toPlainText(row.cells[columnIndex]?.value || "0")}
+                      </span>
+                    `)
+                    .join("")}
+                </div>
+                <p class="cravadas-mobile-games">
+                  <strong>Jogos:</strong> ${toPlainText(row.cells[gamesIndex]?.value || "-")}
+                </p>
+              </article>
+            `)
+            .join("")}
+        </div>
+      `;
+    };
 
     return `
       <section class="predictions-matrix-section">
@@ -5284,8 +5330,8 @@ function renderPredictionConsultation() {
         </div>
 
         ${
-          section.disableMobileBoard
-            ? ""
+          section.mobileVariant === "cravadas-participants"
+            ? renderCravadasMobileCards()
             : `
         <div class="predictions-mobile-board">
           ${section.columns
