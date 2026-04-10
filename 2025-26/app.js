@@ -5226,7 +5226,7 @@ function renderPredictionConsultation() {
       <section class="predictions-matrix-section">
         ${section.sectionTitle ? `<h3 class="predictions-section-title">${section.sectionTitle}</h3>` : ""}
 
-        <div class="table-wrapper predictions-table-desktop">
+        <div class="table-wrapper predictions-table-desktop ${section.disableMobileBoard ? "predictions-table-mobile-visible" : ""}">
           <table class="predictions-matrix-table">
             <thead>
               <tr>

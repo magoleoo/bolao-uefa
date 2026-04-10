@@ -2104,6 +2104,10 @@ option {
     display: none;
   }
 
+  .predictions-table-desktop.predictions-table-mobile-visible {
+    display: block;
+  }
+
   .predictions-mobile-board {
     display: grid;
   }
