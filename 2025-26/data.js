@@ -603,7 +603,9 @@ window.knockoutResults = [
     kickoff: "2026-04-15T16:00:00-03:00",
     homeTeam: "Arsenal",
     awayTeam: "Sporting CP",
-    scoreFinal: { home: null, away: null },
+    scoreFinal: { home: 0, away: 0 },
+    aggregate: "1-0",
+    qualified: "Arsenal",
   },
   {
     id: "QF8",
@@ -612,7 +614,9 @@ window.knockoutResults = [
     kickoff: "2026-04-15T16:00:00-03:00",
     homeTeam: "Bayern München",
     awayTeam: "Real Madrid",
-    scoreFinal: { home: null, away: null },
+    scoreFinal: { home: 4, away: 3 },
+    aggregate: "6-4",
+    qualified: "Bayern München",
   },
   {
     id: "SF1",
