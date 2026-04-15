@@ -831,16 +831,38 @@ function buildQuarterScoringContext() {
     ].filter(Boolean);
     const qualified = legMatches.find((item) => item?.qualified)?.qualified || "";
     if (!qualified) return;
+    const isSuperclassicTie =
+      isEligibleSuperclassicMatch(match.home1, match.away1) ||
+      isEligibleSuperclassicMatch(match.home2, match.away2);
+    const qualifiedHits = [];
 
     rows.forEach((entry) => {
-      const participantTotals = byParticipant.get(normalizeText(entry.participant));
+      const participantKey = normalizeText(entry.participant);
+      const participantTotals = byParticipant.get(participantKey);
       if (!participantTotals) return;
       const predictedQualified = resolveQuarterClassifiedPick(entry, match);
       if (!predictedQualified) return;
       if (canonicalTeamKey(predictedQualified) === canonicalTeamKey(qualified)) {
-        participantTotals.quarter += quarterScoringRules.qualified;
+        let qualifiedPoints = quarterScoringRules.qualified;
+        if (isSuperclassicTie) {
+          participantTotals.superclassic += quarterScoringRules.qualified;
+          qualifiedPoints *= 2;
+        }
+        participantTotals.quarter += qualifiedPoints;
+        qualifiedHits.push({
+          participantKey,
+          pointsAwarded: qualifiedPoints,
+        });
       }
     });
+
+    if (qualifiedHits.length === 1) {
+      const solo = qualifiedHits[0];
+      const participantTotals = byParticipant.get(solo.participantKey);
+      if (!participantTotals) return;
+      participantTotals.quarter += solo.pointsAwarded;
+      participantTotals.hopeSolo += 1;
+    }
   });
 
   return {
@@ -2312,7 +2334,7 @@ function renderRanking(leaderboard) {
           <td>${hasQuarterRows ? formatPoints(row.quarter || 0) : ""}</td>
           <td>${formatPoints(row.superclassicLeaguePhase ?? row.superclassic)}</td>
           <td>
-            <span class="hope-solo-cell" title="Quantidade de placares exatos solitários identificados no backtest">
+            <span class="hope-solo-cell" title="Quantidade de acertos solitários (placar, tendência ou classificado) identificados no backtest">
               <span class="glove-mark" aria-hidden="true">🧤</span>
               <strong>${row.hopeSolo || 0}</strong>
             </span>

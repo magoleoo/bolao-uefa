@@ -764,10 +764,10 @@ window.rulesSections = [
   {
     title: "Regras especiais",
     items: [
-      "Superclássicos: o dobro da pontuação do placar exato e também da tendência em confrontos entre times elegíveis ao superclássico.",
+      "Superclássicos: o dobro da pontuação em confrontos entre times elegíveis ao superclássico, incluindo placar exato, tendência e classificado.",
       "A regra de superclássico vai somente até as quartas de final. Nas semifinais e na final ela não se aplica.",
       "Na 1ª fase, os placares dos superclássicos devem ser preenchidos no espaço dedicado da aba Superclássicos (separado da tendência da fase de liga).",
-      "Hope Solo: quando apenas um participante é o único a acertar o jogo, seja no placar exato ou na tendência, a pontuação desse acerto é dobrada.",
+      "Hope Solo: quando apenas um participante é o único a acertar o jogo (placar exato, tendência ou classificado), a pontuação desse acerto é dobrada.",
       "Prorrogação: acertando o placar nos 90 minutos, vale a regra normal. Acertando apenas o placar da prorrogação, vale metade da pontuação normal de placar.",
       "Final empatada: se o apostador acertar o placar da final mas errar o campeão, recebe só os 23,80 pontos do placar, sem os pontos de classificação.",
     ],
