@@ -1034,6 +1034,22 @@ const quarterScoringRules = {
   qualified: 4.32,
 };
 
+const favoriteProgressScoringRules = {
+  quarterQualified: 6,
+};
+
+function buildFavoriteProgressContext() {
+  const semifinalists = new Set(
+    (knockoutResults || [])
+      .filter((match) => match?.phase === "QUARTER")
+      .map((match) => String(match?.qualified || "").trim())
+      .filter(Boolean)
+      .map((team) => canonicalTeamKey(team))
+  );
+
+  return { semifinalists };
+}
+
 function normalizeScoreToken(value) {
   const text = String(value || "").trim();
   const match = text.match(/^(\d+)\s*[xX-]\s*(\d+)$/);
@@ -1976,6 +1992,7 @@ function getRankingRows() {
 
   const quarterContext = buildQuarterScoringContext();
   const cravadasContext = buildCravadasContext();
+  const favoriteProgressContext = buildFavoriteProgressContext();
   const hasApiMatches =
     Array.isArray(window.apiMatchesData?.matches) &&
     window.apiMatchesData.matches.length > 0;
@@ -2005,6 +2022,11 @@ function getRankingRows() {
       baselineSnapshot.byParticipant.get(participantKey) || createEmptyPhaseScoreRow();
     const liveScores = liveSnapshot.byParticipant.get(participantKey) || baselineScores;
     const cravadas = cravadasContext.byParticipant.get(participantKey) || 0;
+    const favoriteKey = canonicalTeamKey(row.favorite_team || "");
+    const favoriteQuarterQualifiedBonus =
+      favoriteKey && favoriteProgressContext.semifinalists.has(favoriteKey)
+        ? favoriteProgressScoringRules.quarterQualified
+        : 0;
 
     const deltaFirstPhase = roundToTwo(liveScores.firstPhase - baselineScores.firstPhase);
     const deltaPlayoff = roundToTwo(liveScores.playoff - baselineScores.playoff);
@@ -2019,7 +2041,8 @@ function getRankingRows() {
         deltaFirstPhase +
         deltaPlayoff +
         deltaRoundOf16 +
-        quarterAdd.quarter,
+        quarterAdd.quarter +
+        favoriteQuarterQualifiedBonus,
       firstPhase: row.first_phase_points + deltaFirstPhase,
       playoff: row.playoff_points + deltaPlayoff,
       roundOf16: row.round_of_16_points + deltaRoundOf16,
