@@ -2409,6 +2409,7 @@ function renderRanking(leaderboard) {
           <td>${formatPoints(row.playoff)}</td>
           <td>${formatPoints(row.roundOf16)}</td>
           <td>${hasQuarterRows ? formatPoints(row.quarter || 0) : ""}</td>
+          <td>${formatPoints(row.semi || 0)}</td>
           <td>${formatPoints(row.superclassicLeaguePhase ?? row.superclassic)}</td>
           <td>
             <span class="hope-solo-cell" title="Quantidade de acertos solitários (placar, tendência ou classificado) identificados no backtest">
@@ -2451,6 +2452,7 @@ function renderRanking(leaderboard) {
               <span><strong>Playoff</strong>${formatPoints(row.playoff)}</span>
               <span><strong>Oitavas</strong>${formatPoints(row.roundOf16)}</span>
               <span><strong>Quartas</strong>${quarterValue}</span>
+              <span><strong>Semi</strong>${formatPoints(row.semi || 0)}</span>
             </div>
             <div class="ranking-mobile-extra">
               <span><strong>Superclássico (1ª fase):</strong> ${formatPoints(row.superclassicLeaguePhase ?? row.superclassic)}</span>
