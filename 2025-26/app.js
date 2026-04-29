@@ -13,6 +13,7 @@ const {
   predictionHighlightsByMatchTitle,
   predictionsGallery,
   quarterFinalsFormsConfig,
+  semiFinalsPredictionRows,
   tournamentOutcomeFormsConfig,
   rulesHighlights,
   rulesSections,
@@ -135,6 +136,9 @@ let backtestData = null;
 let quarterFinalsFormsData = null;
 let tournamentOutcomeFormsData = null;
 let latestClosingAuditContext = null;
+const semifinalPredictionRowsData = Array.isArray(semiFinalsPredictionRows)
+  ? semiFinalsPredictionRows
+  : [];
 
 function getParticipantById(id) {
   return participants.find((participant) => participant.id === id);
@@ -871,6 +875,67 @@ function buildQuarterScoringContext() {
   };
 }
 
+function buildSemifinalScoringContext() {
+  const rows = extractSemifinalPredictionRows(semifinalPredictionRowsData);
+  const byParticipant = new Map(
+    participants.map((participant) => [
+      normalizeText(participant.name),
+      { semi: 0, hopeSolo: 0 },
+    ])
+  );
+  if (!rows.length) return { byParticipant };
+
+  const semifinalScoringRules = {
+    result: 2.08,
+    exact: 12.48,
+  };
+  const fixtures = buildSemifinalPredictionFixturesFromManual();
+
+  fixtures.forEach((fixture) => {
+    const officialScore = parseScoreFromText(fixture?.official);
+    if (!officialScore) return;
+    const officialResult = matchResultFromScores(officialScore.home, officialScore.away);
+    if (!officialResult) return;
+
+    const hits = [];
+    (fixture.picks || []).forEach((pick) => {
+      const participantKey = normalizeText(pick?.participant || "");
+      const participantTotals = byParticipant.get(participantKey);
+      if (!participantTotals) return;
+      const predictedScore = parseScoreFromText(pick?.pick);
+      if (!predictedScore) return;
+
+      let pointsAwarded = 0;
+      if (
+        predictedScore.home === officialScore.home &&
+        predictedScore.away === officialScore.away
+      ) {
+        pointsAwarded = semifinalScoringRules.exact;
+      } else {
+        const predictedResult = matchResultFromScores(predictedScore.home, predictedScore.away);
+        if (predictedResult && predictedResult === officialResult) {
+          pointsAwarded = semifinalScoringRules.result;
+        }
+      }
+
+      if (!pointsAwarded) return;
+      participantTotals.semi += pointsAwarded;
+      hits.push({ participantTotals, pointsAwarded });
+    });
+
+    if (hits.length === 1) {
+      hits[0].participantTotals.semi += hits[0].pointsAwarded;
+      hits[0].participantTotals.hopeSolo += 1;
+    }
+  });
+
+  byParticipant.forEach((row) => {
+    row.semi = roundToTwo(row.semi);
+  });
+
+  return { byParticipant };
+}
+
 function buildCravadasContext() {
   const byParticipant = new Map(
     participants.map((participant) => [normalizeText(participant.name), 0])
@@ -988,7 +1053,12 @@ function buildCravadasContext() {
     { phaseId: "SEMI", phaseKey: "semi" },
     { phaseId: "FINAL", phaseKey: "final" },
   ].forEach(({ phaseId, phaseKey }) => {
-    const fixtures = backtestData?.phases?.[phaseId]?.fixtures || [];
+    const fallbackSemifinals =
+      phaseId === "SEMI" ? buildSemifinalPredictionFixturesFromManual() : [];
+    const fixtures =
+      backtestData?.phases?.[phaseId]?.fixtures?.length
+        ? backtestData.phases[phaseId].fixtures
+        : fallbackSemifinals;
     fixtures.forEach((fixture) => {
       if (isPredictionClassificationFixture(fixture)) return;
       countExactFromFixture(fixture, fixture.picks || [], phaseKey);
@@ -2013,6 +2083,7 @@ function getRankingRows() {
   if (!backtestData || !backtestData.ranking) return [];
 
   const quarterContext = buildQuarterScoringContext();
+  const semifinalContext = buildSemifinalScoringContext();
   const cravadasContext = buildCravadasContext();
   const favoriteProgressContext = buildFavoriteProgressContext();
   const hasApiMatches =
@@ -2036,6 +2107,10 @@ function getRankingRows() {
     const quarterAdd = quarterContext.byParticipant.get(normalizeText(participant.name)) || {
       quarter: 0,
       superclassic: 0,
+      hopeSolo: 0,
+    };
+    const semiAdd = semifinalContext.byParticipant.get(normalizeText(participant.name)) || {
+      semi: 0,
       hopeSolo: 0,
     };
 
@@ -2064,15 +2139,17 @@ function getRankingRows() {
         deltaPlayoff +
         deltaRoundOf16 +
         quarterAdd.quarter +
+        semiAdd.semi +
         favoriteQuarterQualifiedBonus,
       firstPhase: row.first_phase_points + deltaFirstPhase,
       playoff: row.playoff_points + deltaPlayoff,
       roundOf16: row.round_of_16_points + deltaRoundOf16,
       quarter: quarterAdd.quarter,
+      semi: semiAdd.semi,
       superclassicLeaguePhase: row.superclassic_points,
       superclassic:
         row.superclassic_points + deltaSuperclassic + quarterAdd.superclassic,
-      hopeSolo: row.hope_solo_hits + deltaHopeSolo + quarterAdd.hopeSolo,
+      hopeSolo: row.hope_solo_hits + deltaHopeSolo + quarterAdd.hopeSolo + semiAdd.hopeSolo,
       cravadas,
       favoriteTeam: row.favorite_team || "-",
       championPick: resolveChampionPickFromRow(row) || "-",
@@ -3469,6 +3546,13 @@ const qrMatches = [
   { id: "Q4", home1: "Paris Saint-Germain", away1: "Liverpool", home2: "Liverpool", away2: "Paris Saint-Germain" }
 ];
 
+const sfMatches = [
+  { id: "SF1", leg: "IDA", home: "Paris Saint-Germain", away: "Bayern München", matchday: "Semifinal - ida" },
+  { id: "SF2", leg: "IDA", home: "Atlético de Madrid", away: "Arsenal", matchday: "Semifinal - ida" },
+  { id: "SF3", leg: "VOLTA", home: "Arsenal", away: "Atlético de Madrid", matchday: "Semifinal - volta" },
+  { id: "SF4", leg: "VOLTA", home: "Bayern München", away: "Paris Saint-Germain", matchday: "Semifinal - volta" },
+];
+
 function loadQfDrafts() {
   try {
     const raw = localStorage.getItem(storageKeys.qfDrafts);
@@ -4426,6 +4510,85 @@ function buildQuarterPredictionFixturesFromForms() {
   return fixtures;
 }
 
+function extractSemifinalPredictionRows(rawRows) {
+  if (!Array.isArray(rawRows) || !rawRows.length) return [];
+
+  const participantIndex = new Map(
+    participants.map((participant) => [normalizeText(participant.name), participant.name])
+  );
+  const canonicalParticipantName = (name) =>
+    participantIndex.get(normalizeText(name)) || String(name || "").trim();
+
+  const latestByParticipant = new Map();
+  rawRows.forEach((row, sourceIndex) => {
+    const participant = canonicalParticipantName(resolveParticipantNameFromFormRow(row));
+    if (!participant) return;
+    const key = normalizeText(participant);
+    const candidate = {
+      participant,
+      row,
+      sourceIndex,
+      timestamp: parseFormsTimestamp(row),
+    };
+    const current = latestByParticipant.get(key);
+    if (!current) {
+      latestByParticipant.set(key, candidate);
+      return;
+    }
+    const currentTime = Number.isFinite(current.timestamp)
+      ? current.timestamp
+      : Number.NEGATIVE_INFINITY;
+    const candidateTime = Number.isFinite(candidate.timestamp)
+      ? candidate.timestamp
+      : Number.NEGATIVE_INFINITY;
+    if (
+      candidateTime > currentTime ||
+      (candidateTime === currentTime && sourceIndex > current.sourceIndex)
+    ) {
+      latestByParticipant.set(key, candidate);
+    }
+  });
+
+  return [...latestByParticipant.values()].sort((a, b) =>
+    a.participant.localeCompare(b.participant, "pt-BR")
+  );
+}
+
+function buildSemifinalPredictionFixturesFromManual() {
+  const rows = extractSemifinalPredictionRows(semifinalPredictionRowsData);
+  if (!rows.length) return [];
+
+  return sfMatches.map((match) => {
+    const officialMatch = findKnockoutMatchByTeams("SEMI", match.home, match.away);
+    const officialHome = parseIntegerScore(officialMatch?.scoreFinal?.home);
+    const officialAway = parseIntegerScore(officialMatch?.scoreFinal?.away);
+    const official =
+      Number.isFinite(officialHome) && Number.isFinite(officialAway)
+        ? `${officialHome}x${officialAway}`
+        : "-";
+
+    const picks = [];
+    rows.forEach((entry) => {
+      const predictedHome = parseIntegerScore(entry.row?.[`${match.id}_home`]);
+      const predictedAway = parseIntegerScore(entry.row?.[`${match.id}_away`]);
+      if (!Number.isFinite(predictedHome) || !Number.isFinite(predictedAway)) return;
+      picks.push({
+        participant: entry.participant,
+        pick: `${predictedHome}x${predictedAway}`,
+        rank_value: "",
+      });
+    });
+
+    return {
+      label: `${match.home} x ${match.away}`,
+      leg: match.leg,
+      matchday: match.matchday,
+      official,
+      picks,
+    };
+  });
+}
+
 function buildPredictionMatrixSection(fixtures, sectionTitle = "") {
   const knownParticipants = participants.map((participant) => participant.name);
   const knownParticipantsKeys = new Set(knownParticipants.map((name) => normalizeText(name)));
@@ -5164,6 +5327,13 @@ function renderPredictionConsultation() {
         rawFixtures = quarterFixturesFromForms;
       } else if (!rawFixtures.length) {
         rawFixtures = backtestData?.phases?.QUARTER?.fixtures || [];
+      }
+    } else if (activePredictionsPhase === "SEMI_FINALS") {
+      const semifinalFixturesFromManual = buildSemifinalPredictionFixturesFromManual();
+      if (semifinalFixturesFromManual.length) {
+        rawFixtures = semifinalFixturesFromManual;
+      } else if (!rawFixtures.length) {
+        rawFixtures = backtestData?.phases?.SEMI?.fixtures || [];
       }
     }
     if (hasKnockoutClassifiedSubview) {

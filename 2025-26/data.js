@@ -128,6 +128,30 @@ window.quarterFinalsFormsConfig = {
   ],
 };
 
+window.semiFinalsPredictionRows = [
+  { Participante: "Marcel", SF1_home: 2, SF1_away: 1, SF2_home: 1, SF2_away: 1, SF3_home: 2, SF3_away: 1, SF4_home: 3, SF4_away: 2 },
+  { Participante: "Dan", SF1_home: 2, SF1_away: 1, SF2_home: 3, SF2_away: 1, SF3_home: 1, SF3_away: 0, SF4_home: 2, SF4_away: 1 },
+  { Participante: "Felippe Leite", SF1_home: 2, SF1_away: 2, SF2_home: 1, SF2_away: 2, SF3_home: 2, SF3_away: 1, SF4_home: 3, SF4_away: 1 },
+  { Participante: "Leo Raposo", SF1_home: 2, SF1_away: 3, SF2_home: 1, SF2_away: 2, SF3_home: 2, SF3_away: 0, SF4_home: 2, SF4_away: 3 },
+  { Participante: "Gui Giron", SF1_home: 1, SF1_away: 1, SF2_home: 1, SF2_away: 1, SF3_home: 2, SF3_away: 0, SF4_home: 2, SF4_away: 0 },
+  { Participante: "Scarpa", SF1_home: 1, SF1_away: 2, SF2_home: 1, SF2_away: 1, SF3_home: 2, SF3_away: 0, SF4_home: 3, SF4_away: 2 },
+  { Participante: "Rafinha", SF1_home: 1, SF1_away: 3, SF2_home: 2, SF2_away: 1, SF3_home: 1, SF3_away: 1, SF4_home: 2, SF4_away: 0 },
+  { Participante: "Biel", SF1_home: 2, SF1_away: 1, SF2_home: 1, SF2_away: 0, SF3_home: 2, SF3_away: 0, SF4_home: 3, SF4_away: 1 },
+  { Participante: "Serginho", SF1_home: 2, SF1_away: 1, SF2_home: 1, SF2_away: 1, SF3_home: 2, SF3_away: 1, SF4_home: 1, SF4_away: 0 },
+  { Participante: "Muca", SF1_home: 2, SF1_away: 2, SF2_home: 2, SF2_away: 1, SF3_home: 1, SF3_away: 1, SF4_home: 3, SF4_away: 1 },
+  { Participante: "Leo Picca", SF1_home: 2, SF1_away: 2, SF2_home: 2, SF2_away: 1, SF3_home: 2, SF3_away: 1, SF4_home: 3, SF4_away: 2 },
+  { Participante: "Victor", SF1_home: 2, SF1_away: 2, SF2_home: 2, SF2_away: 1, SF3_home: 3, SF3_away: 1, SF4_home: 3, SF4_away: 1 },
+  { Participante: "Enrico", SF1_home: 2, SF1_away: 1, SF2_home: 0, SF2_away: 1, SF3_home: 3, SF3_away: 1, SF4_home: 2, SF4_away: 2 },
+  { Participante: "Nanel", SF1_home: 2, SF1_away: 2, SF2_home: 2, SF2_away: 1, SF3_home: 3, SF3_away: 2, SF4_home: 3, SF4_away: 1 },
+  { Participante: "Faber", SF1_home: 1, SF1_away: 2, SF2_home: 3, SF2_away: 0, SF3_home: 2, SF3_away: 0, SF4_home: 2, SF4_away: 2 },
+  { Participante: "Celsinho", SF1_home: 0, SF1_away: 0, SF2_home: 0, SF2_away: 0, SF3_home: 1, SF3_away: 0, SF4_home: 0, SF4_away: 0 },
+  { Participante: "Ranieri", SF1_home: 3, SF1_away: 1, SF2_home: 2, SF2_away: 2, SF3_home: 4, SF3_away: 1, SF4_home: 2, SF4_away: 1 },
+  { Participante: "Feijão", SF1_home: 2, SF1_away: 0, SF2_home: 2, SF2_away: 0, SF3_home: 1, SF3_away: 0, SF4_home: 1, SF4_away: 1 },
+  { Participante: "Ivan", SF1_home: 1, SF1_away: 3, SF2_home: 2, SF2_away: 2, SF3_home: 4, SF3_away: 2, SF4_home: 4, SF4_away: 2 },
+  { Participante: "Michel", SF1_home: 2, SF1_away: 3, SF2_home: 2, SF2_away: 1, SF3_home: 0, SF3_away: 2, SF4_home: 3, SF4_away: 2 },
+  { Participante: "Deco", SF1_home: 1, SF1_away: 2, SF2_home: 1, SF2_away: 1, SF3_home: 1, SF3_away: 0, SF4_home: 2, SF4_away: 1 },
+];
+
 window.supabaseShadowConfig = {
   enabled: false,
   url: "",
