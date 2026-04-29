@@ -152,6 +152,30 @@ window.semiFinalsPredictionRows = [
   { Participante: "Deco", SF1_home: 1, SF1_away: 2, SF2_home: 1, SF2_away: 1, SF3_home: 1, SF3_away: 0, SF4_home: 2, SF4_away: 1 },
 ];
 
+window.semiFinalsClassifiedRows = [
+  { Participante: "Marcel", SF1_classificado: "Paris Saint-Germain", SF2_classificado: "Arsenal" },
+  { Participante: "Dan", SF1_classificado: "Paris Saint-Germain", SF2_classificado: "Atlético de Madrid" },
+  { Participante: "Felippe Leite", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
+  { Participante: "Leo Raposo", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
+  { Participante: "Gui Giron", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
+  { Participante: "Scarpa", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
+  { Participante: "Rafinha", SF1_classificado: "Bayern de Munique", SF2_classificado: "Atlético de Madrid" },
+  { Participante: "Biel", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
+  { Participante: "Serginho", SF1_classificado: "Paris Saint-Germain", SF2_classificado: "Arsenal" },
+  { Participante: "Muca", SF1_classificado: "Bayern de Munique", SF2_classificado: "Atlético de Madrid" },
+  { Participante: "Leo Picca", SF1_classificado: "Bayern de Munique", SF2_classificado: "Atlético de Madrid" },
+  { Participante: "Victor", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
+  { Participante: "Enrico", SF1_classificado: "Paris Saint-Germain", SF2_classificado: "Arsenal" },
+  { Participante: "Nanel", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
+  { Participante: "Faber", SF1_classificado: "Bayern de Munique", SF2_classificado: "Atlético de Madrid" },
+  { Participante: "Celsinho", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
+  { Participante: "Ranieri", SF1_classificado: "Paris Saint-Germain", SF2_classificado: "Arsenal" },
+  { Participante: "Feijão", SF1_classificado: "Paris Saint-Germain", SF2_classificado: "Atlético de Madrid" },
+  { Participante: "Ivan", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
+  { Participante: "Michel", SF1_classificado: "Bayern de Munique", SF2_classificado: "Atlético de Madrid" },
+  { Participante: "Deco", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
+];
+
 window.supabaseShadowConfig = {
   enabled: false,
   url: "",

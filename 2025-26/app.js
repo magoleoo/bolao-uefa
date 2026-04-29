@@ -13,6 +13,7 @@ const {
   predictionHighlightsByMatchTitle,
   predictionsGallery,
   quarterFinalsFormsConfig,
+  semiFinalsClassifiedRows,
   semiFinalsPredictionRows,
   tournamentOutcomeFormsConfig,
   rulesHighlights,
@@ -138,6 +139,9 @@ let tournamentOutcomeFormsData = null;
 let latestClosingAuditContext = null;
 const semifinalPredictionRowsData = Array.isArray(semiFinalsPredictionRows)
   ? semiFinalsPredictionRows
+  : [];
+const semifinalClassifiedRowsData = Array.isArray(semiFinalsClassifiedRows)
+  ? semiFinalsClassifiedRows
   : [];
 
 function getParticipantById(id) {
@@ -3555,6 +3559,23 @@ const sfMatches = [
   { id: "SF4", leg: "VOLTA", home: "Bayern München", away: "Paris Saint-Germain", matchday: "Semifinal - volta" },
 ];
 
+const sfClassifiedTies = [
+  {
+    id: "SF1",
+    field: "SF1_classificado",
+    home: "Paris Saint-Germain",
+    away: "Bayern München",
+    matchday: "Confronto 1",
+  },
+  {
+    id: "SF2",
+    field: "SF2_classificado",
+    home: "Atlético de Madrid",
+    away: "Arsenal",
+    matchday: "Confronto 2",
+  },
+];
+
 function loadQfDrafts() {
   try {
     const raw = localStorage.getItem(storageKeys.qfDrafts);
@@ -4558,9 +4579,10 @@ function extractSemifinalPredictionRows(rawRows) {
 
 function buildSemifinalPredictionFixturesFromManual() {
   const rows = extractSemifinalPredictionRows(semifinalPredictionRowsData);
-  if (!rows.length) return [];
+  const classifiedRows = extractSemifinalPredictionRows(semifinalClassifiedRowsData);
+  if (!rows.length && !classifiedRows.length) return [];
 
-  return sfMatches.map((match) => {
+  const fixtures = sfMatches.map((match) => {
     const officialMatch = findKnockoutMatchByTeams("SEMI", match.home, match.away);
     const officialHome = parseIntegerScore(officialMatch?.scoreFinal?.home);
     const officialAway = parseIntegerScore(officialMatch?.scoreFinal?.away);
@@ -4589,6 +4611,45 @@ function buildSemifinalPredictionFixturesFromManual() {
       picks,
     };
   });
+
+  const resolveSemifinalQualifiedOfficial = (homeTeam, awayTeam) => {
+    const official = (knockoutResults || []).find((match) => {
+      if (match?.phase !== "SEMI") return false;
+      const hasQualified = String(match?.qualified || "").trim();
+      if (!hasQualified) return false;
+      const keyA = canonicalTeamKey(homeTeam);
+      const keyB = canonicalTeamKey(awayTeam);
+      const matchHome = canonicalTeamKey(match.homeTeam);
+      const matchAway = canonicalTeamKey(match.awayTeam);
+      return (
+        (matchHome === keyA && matchAway === keyB) ||
+        (matchHome === keyB && matchAway === keyA)
+      );
+    });
+    return String(official?.qualified || "").trim() || "-";
+  };
+
+  sfClassifiedTies.forEach((tie) => {
+    const picks = [];
+    classifiedRows.forEach((entry) => {
+      const pick = String(entry.row?.[tie.field] || "").trim();
+      if (!pick) return;
+      picks.push({
+        participant: entry.participant,
+        pick,
+        rank_value: "",
+      });
+    });
+
+    fixtures.push({
+      label: `Classificado: ${tie.home} x ${tie.away}`,
+      matchday: tie.matchday,
+      official: resolveSemifinalQualifiedOfficial(tie.home, tie.away),
+      picks,
+    });
+  });
+
+  return fixtures;
 }
 
 function buildPredictionMatrixSection(fixtures, sectionTitle = "") {
