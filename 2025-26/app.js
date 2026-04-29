@@ -4928,7 +4928,9 @@ function buildPredictionExportCanvas(payload) {
     totalHeight += sectionTitleHeight + headerHeight + section.rows.length * rowHeight + sectionGap;
   });
 
-  const width = Math.max(900, contentWidth + padding * 2);
+  // Para fases com menos colunas (ex.: semis), evita canvas "sobrando" à direita
+  // e faz a tabela ocupar melhor toda a página no PDF.
+  const width = contentWidth + padding * 2;
   const height = totalHeight + padding;
   const scale = 2;
 
