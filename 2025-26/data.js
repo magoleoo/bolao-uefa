@@ -691,8 +691,9 @@ window.knockoutResults = [
     kickoff: "2026-05-05T16:00:00-03:00",
     homeTeam: "Arsenal",
     awayTeam: "Atlético de Madrid",
-    aggregate: "1-1",
-    scoreFinal: { home: null, away: null },
+    aggregate: "2-1",
+    qualified: "Arsenal",
+    scoreFinal: { home: 1, away: 0 },
   },
   {
     id: "SF4",

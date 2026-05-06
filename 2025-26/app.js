@@ -881,19 +881,36 @@ function buildQuarterScoringContext() {
 
 function buildSemifinalScoringContext() {
   const rows = extractSemifinalPredictionRows(semifinalPredictionRowsData);
+  const classifiedRows = extractSemifinalPredictionRows(semifinalClassifiedRowsData);
   const byParticipant = new Map(
     participants.map((participant) => [
       normalizeText(participant.name),
       { semi: 0, hopeSolo: 0 },
     ])
   );
-  if (!rows.length) return { byParticipant };
+  if (!rows.length && !classifiedRows.length) return { byParticipant };
 
   const semifinalScoringRules = {
     result: 2.08,
     exact: 12.48,
+    qualified: 6.24,
   };
   const fixtures = buildSemifinalPredictionFixturesFromManual();
+  const findSemifinalQualified = (homeTeam, awayTeam) => {
+    const official = (knockoutResults || []).find((match) => {
+      if (match?.phase !== "SEMI") return false;
+      if (!String(match?.qualified || "").trim()) return false;
+      const keyA = canonicalTeamKey(homeTeam);
+      const keyB = canonicalTeamKey(awayTeam);
+      const matchHome = canonicalTeamKey(match.homeTeam);
+      const matchAway = canonicalTeamKey(match.awayTeam);
+      return (
+        (matchHome === keyA && matchAway === keyB) ||
+        (matchHome === keyB && matchAway === keyA)
+      );
+    });
+    return String(official?.qualified || "").trim();
+  };
 
   fixtures.forEach((fixture) => {
     const officialScore = parseScoreFromText(fixture?.official);
@@ -930,6 +947,31 @@ function buildSemifinalScoringContext() {
     if (hits.length === 1) {
       hits[0].participantTotals.semi += hits[0].pointsAwarded;
       hits[0].participantTotals.hopeSolo += 1;
+    }
+  });
+
+  sfClassifiedTies.forEach((tie) => {
+    const qualified = findSemifinalQualified(tie.home, tie.away);
+    if (!qualified) return;
+
+    const qualifiedHits = [];
+    classifiedRows.forEach((entry) => {
+      const participantKey = normalizeText(entry.participant);
+      const participantTotals = byParticipant.get(participantKey);
+      if (!participantTotals) return;
+
+      const predictedQualified = String(entry.row?.[tie.field] || "").trim();
+      if (!predictedQualified) return;
+      if (canonicalTeamKey(predictedQualified) !== canonicalTeamKey(qualified)) return;
+
+      const pointsAwarded = semifinalScoringRules.qualified;
+      participantTotals.semi += pointsAwarded;
+      qualifiedHits.push({ participantTotals, pointsAwarded });
+    });
+
+    if (qualifiedHits.length === 1) {
+      qualifiedHits[0].participantTotals.semi += qualifiedHits[0].pointsAwarded;
+      qualifiedHits[0].participantTotals.hopeSolo += 1;
     }
   });
 
@@ -1132,6 +1174,7 @@ const quarterScoringRules = {
 
 const favoriteProgressScoringRules = {
   quarterQualified: 6,
+  semifinalQualified: 8,
 };
 
 function buildFavoriteProgressContext() {
@@ -1142,8 +1185,15 @@ function buildFavoriteProgressContext() {
       .filter(Boolean)
       .map((team) => canonicalTeamKey(team))
   );
+  const finalists = new Set(
+    (knockoutResults || [])
+      .filter((match) => match?.phase === "SEMI")
+      .map((match) => String(match?.qualified || "").trim())
+      .filter(Boolean)
+      .map((team) => canonicalTeamKey(team))
+  );
 
-  return { semifinalists };
+  return { semifinalists, finalists };
 }
 
 function normalizeScoreToken(value) {
@@ -2128,6 +2178,10 @@ function getRankingRows() {
       favoriteKey && favoriteProgressContext.semifinalists.has(favoriteKey)
         ? favoriteProgressScoringRules.quarterQualified
         : 0;
+    const favoriteSemifinalQualifiedBonus =
+      favoriteKey && favoriteProgressContext.finalists.has(favoriteKey)
+        ? favoriteProgressScoringRules.semifinalQualified
+        : 0;
 
     const deltaFirstPhase = roundToTwo(liveScores.firstPhase - baselineScores.firstPhase);
     const deltaPlayoff = roundToTwo(liveScores.playoff - baselineScores.playoff);
@@ -2144,7 +2198,8 @@ function getRankingRows() {
         deltaRoundOf16 +
         quarterAdd.quarter +
         semiAdd.semi +
-        favoriteQuarterQualifiedBonus,
+        favoriteQuarterQualifiedBonus +
+        favoriteSemifinalQualifiedBonus,
       firstPhase: row.first_phase_points + deltaFirstPhase,
       playoff: row.playoff_points + deltaPlayoff,
       roundOf16: row.round_of_16_points + deltaRoundOf16,
