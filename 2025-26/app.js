@@ -15,6 +15,7 @@ const {
   quarterFinalsFormsConfig,
   semiFinalsClassifiedRows,
   semiFinalsPredictionRows,
+  tournamentOutcomeManual,
   tournamentOutcomeFormsConfig,
   rulesHighlights,
   rulesSections,
@@ -1627,15 +1628,30 @@ function loadTournamentOutcome() {
   try {
     const raw = localStorage.getItem(storageKeys.tournamentOutcome);
     const parsed = raw ? JSON.parse(raw) : {};
-    if (!parsed || typeof parsed !== "object") return createDefaultTournamentOutcome();
+    const manualOutcome =
+      tournamentOutcomeManual && typeof tournamentOutcomeManual === "object"
+        ? tournamentOutcomeManual
+        : {};
+    if (!parsed || typeof parsed !== "object") {
+      return {
+        ...createDefaultTournamentOutcome(),
+        ...manualOutcome,
+      };
+    }
     return {
       ...createDefaultTournamentOutcome(),
       ...parsed,
-      source: "legacy-local",
+      ...manualOutcome,
+      source: manualOutcome.source || "legacy-local",
     };
   } catch (error) {
     console.error("Falha ao ler dados de encerramento do bolão.", error);
-    return createDefaultTournamentOutcome();
+    return {
+      ...createDefaultTournamentOutcome(),
+      ...(tournamentOutcomeManual && typeof tournamentOutcomeManual === "object"
+        ? tournamentOutcomeManual
+        : {}),
+    };
   }
 }
 

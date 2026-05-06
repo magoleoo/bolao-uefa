@@ -203,6 +203,15 @@ window.tournamentOutcomeFormsConfig = {
   ],
 };
 
+window.tournamentOutcomeManual = {
+  champion: "",
+  scorer: "Kylian Mbappé",
+  assist: "",
+  updatedAt: "2026-05-06T22:00:00-03:00",
+  updatedBy: "Atualização manual do bolão",
+  source: "manual",
+};
+
 window.teamLogos = {
   Ajax: "https://www.google.com/s2/favicons?sz=128&domain_url=https://www.ajax.nl",
   "Real Madrid": "https://www.google.com/s2/favicons?sz=128&domain_url=https://www.realmadrid.com",
@@ -702,16 +711,17 @@ window.knockoutResults = [
     kickoff: "2026-05-06T16:00:00-03:00",
     homeTeam: "Bayern München",
     awayTeam: "Paris Saint-Germain",
-    aggregate: "4-5",
-    scoreFinal: { home: null, away: null },
+    aggregate: "5-6",
+    qualified: "Paris Saint-Germain",
+    scoreFinal: { home: 1, away: 1 },
   },
   {
     id: "F1",
     phase: "FINAL",
     roundLabel: "Final",
     kickoff: "2026-05-30T13:00:00-03:00",
-    homeTeam: "Vencedor SF1",
-    awayTeam: "Vencedor SF2",
+    homeTeam: "Paris Saint-Germain",
+    awayTeam: "Arsenal",
     scoreFinal: { home: null, away: null },
   },
 ];
