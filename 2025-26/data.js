@@ -197,6 +197,7 @@ window.finalPredictionRows = [
   { Timestamp: "2026-05-30T07:36:34-03:00", Email: "mfmagini@gmail.com", Participante: "Muca", F1_home: 3, F1_away: 0, F1_champion: "Paris Saint-Germain" },
   { Timestamp: "2026-05-30T07:40:29-03:00", Email: "gustavopstella@gmail.com", Participante: "Feijão", F1_home: 3, F1_away: 1, F1_champion: "Paris Saint-Germain" },
   { Timestamp: "2026-05-30T08:34:18-03:00", Email: "danielgevaerd@hotmail.com", Participante: "Nanel", F1_home: 2, F1_away: 3, F1_champion: "Arsenal" },
+  { Timestamp: "", Email: "", Participante: "Faber", F1_home: 2, F1_away: 3, F1_champion: "Arsenal" },
 ];
 
 window.supabaseShadowConfig = {
