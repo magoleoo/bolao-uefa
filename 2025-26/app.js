@@ -985,6 +985,82 @@ function buildSemifinalScoringContext() {
   return { byParticipant };
 }
 
+function buildFinalScoringContext() {
+  const rows = extractSemifinalPredictionRows(finalPredictionRowsData);
+  const byParticipant = new Map(
+    participants.map((participant) => [
+      normalizeText(participant.name),
+      { final: 0, hopeSolo: 0 },
+    ])
+  );
+  if (!rows.length) return { byParticipant };
+
+  const finalScoringRules = {
+    result: 7,
+    exact: 23.8,
+  };
+  const officialMatch = findKnockoutMatchByTeams(
+    "FINAL",
+    finalPredictionMatch.home,
+    finalPredictionMatch.away
+  );
+  const officialHome = parseIntegerScore(officialMatch?.scoreFinal?.home);
+  const officialAway = parseIntegerScore(officialMatch?.scoreFinal?.away);
+  if (!Number.isFinite(officialHome) || !Number.isFinite(officialAway)) {
+    return { byParticipant };
+  }
+
+  const officialResult = matchResultFromScores(officialHome, officialAway);
+  if (!officialResult) return { byParticipant };
+
+  const hits = [];
+  rows.forEach((entry) => {
+    const participantKey = normalizeText(entry.participant);
+    const participantTotals = byParticipant.get(participantKey);
+    if (!participantTotals) return;
+
+    const predictedHome = parseIntegerScore(entry.row?.[`${finalPredictionMatch.id}_home`]);
+    const predictedAway = parseIntegerScore(entry.row?.[`${finalPredictionMatch.id}_away`]);
+    if (!Number.isFinite(predictedHome) || !Number.isFinite(predictedAway)) return;
+
+    let pointsAwarded = 0;
+    if (predictedHome === officialHome && predictedAway === officialAway) {
+      pointsAwarded = finalScoringRules.exact;
+    } else {
+      const predictedResult = matchResultFromScores(predictedHome, predictedAway);
+      if (predictedResult && predictedResult === officialResult) {
+        pointsAwarded = finalScoringRules.result;
+      }
+    }
+
+    if (!pointsAwarded) return;
+    participantTotals.final += pointsAwarded;
+    hits.push({ participantTotals, pointsAwarded });
+  });
+
+  if (hits.length === 1) {
+    hits[0].participantTotals.final += hits[0].pointsAwarded;
+    hits[0].participantTotals.hopeSolo += 1;
+  }
+
+  byParticipant.forEach((row) => {
+    row.final = roundToTwo(row.final);
+  });
+
+  return { byParticipant };
+}
+
+function buildFinalChampionPicksByParticipant() {
+  const rows = extractSemifinalPredictionRows(finalPredictionRowsData);
+  const byParticipant = new Map();
+  rows.forEach((entry) => {
+    const championPick = String(entry.row?.[`${finalPredictionMatch.id}_champion`] || "").trim();
+    if (!championPick) return;
+    byParticipant.set(normalizeText(entry.participant), championPick);
+  });
+  return byParticipant;
+}
+
 function buildCravadasContext() {
   const byParticipant = new Map(
     participants.map((participant) => [normalizeText(participant.name), 0])
@@ -1104,10 +1180,14 @@ function buildCravadasContext() {
   ].forEach(({ phaseId, phaseKey }) => {
     const fallbackSemifinals =
       phaseId === "SEMI" ? buildSemifinalPredictionFixturesFromManual() : [];
+    const fallbackFinals =
+      phaseId === "FINAL" ? buildFinalPredictionFixturesFromManual() : [];
     const fixtures =
       backtestData?.phases?.[phaseId]?.fixtures?.length
         ? backtestData.phases[phaseId].fixtures
-        : fallbackSemifinals;
+        : fallbackSemifinals.length
+          ? fallbackSemifinals
+          : fallbackFinals;
     fixtures.forEach((fixture) => {
       if (isPredictionClassificationFixture(fixture)) return;
       countExactFromFixture(fixture, fixture.picks || [], phaseKey);
@@ -2156,7 +2236,9 @@ function getRankingRows() {
 
   const quarterContext = buildQuarterScoringContext();
   const semifinalContext = buildSemifinalScoringContext();
+  const finalContext = buildFinalScoringContext();
   const cravadasContext = buildCravadasContext();
+  const finalChampionPicks = buildFinalChampionPicksByParticipant();
   const favoriteProgressContext = buildFavoriteProgressContext();
   const hasApiMatches =
     Array.isArray(window.apiMatchesData?.matches) &&
@@ -2187,6 +2269,10 @@ function getRankingRows() {
     };
 
     const participantKey = normalizeText(participant.name);
+    const finalAdd = finalContext.byParticipant.get(participantKey) || {
+      final: 0,
+      hopeSolo: 0,
+    };
     const baselineScores =
       baselineSnapshot.byParticipant.get(participantKey) || createEmptyPhaseScoreRow();
     const liveScores = liveSnapshot.byParticipant.get(participantKey) || baselineScores;
@@ -2216,6 +2302,7 @@ function getRankingRows() {
         deltaRoundOf16 +
         quarterAdd.quarter +
         semiAdd.semi +
+        finalAdd.final +
         favoriteQuarterQualifiedBonus +
         favoriteSemifinalQualifiedBonus,
       firstPhase: row.first_phase_points + deltaFirstPhase,
@@ -2223,13 +2310,19 @@ function getRankingRows() {
       roundOf16: row.round_of_16_points + deltaRoundOf16,
       quarter: quarterAdd.quarter,
       semi: semiAdd.semi,
+      final: finalAdd.final,
       superclassicLeaguePhase: row.superclassic_points,
       superclassic:
         row.superclassic_points + deltaSuperclassic + quarterAdd.superclassic,
-      hopeSolo: row.hope_solo_hits + deltaHopeSolo + quarterAdd.hopeSolo + semiAdd.hopeSolo,
+      hopeSolo:
+        row.hope_solo_hits +
+        deltaHopeSolo +
+        quarterAdd.hopeSolo +
+        semiAdd.hopeSolo +
+        finalAdd.hopeSolo,
       cravadas,
       favoriteTeam: row.favorite_team || "-",
-      championPick: resolveChampionPickFromRow(row) || "-",
+      championPick: finalChampionPicks.get(participantKey) || resolveChampionPickFromRow(row) || "-",
       scorerPick: row.scorer_pick || "-",
       assistPick: row.assist_pick || "-"
     };
@@ -2247,6 +2340,9 @@ function getRankingRows() {
       ...row,
       closingBonus: audit.totalBonus,
       closingAudit: audit,
+      final: roundToTwo(
+        (row.final || 0) + audit.championPoints + audit.favoriteChampionPoints
+      ),
       total: roundToTwo(row.total + audit.totalBonus),
     };
   });
@@ -2487,6 +2583,7 @@ function renderRanking(leaderboard) {
           <td>${formatPoints(row.roundOf16)}</td>
           <td>${hasQuarterRows ? formatPoints(row.quarter || 0) : ""}</td>
           <td>${formatPoints(row.semi || 0)}</td>
+          <td>${formatPoints(row.final || 0)}</td>
           <td>${formatPoints(row.superclassicLeaguePhase ?? row.superclassic)}</td>
           <td>
             <span class="hope-solo-cell" title="Quantidade de acertos solitários (placar, tendência ou classificado) identificados no backtest">
@@ -2530,6 +2627,7 @@ function renderRanking(leaderboard) {
               <span><strong>Oitavas</strong>${formatPoints(row.roundOf16)}</span>
               <span><strong>Quartas</strong>${quarterValue}</span>
               <span><strong>Semi</strong>${formatPoints(row.semi || 0)}</span>
+              <span><strong>Final</strong>${formatPoints(row.final || 0)}</span>
             </div>
             <div class="ranking-mobile-extra">
               <span><strong>Superclássico (1ª fase):</strong> ${formatPoints(row.superclassicLeaguePhase ?? row.superclassic)}</span>
@@ -2803,7 +2901,15 @@ function renderParticipantSnapshot() {
 }
 
 function renderHistory() {
-  historyTable.innerHTML = [...winnersHistory]
+  const isValidPlacementName = (value) => {
+    const text = String(value || "").trim();
+    return Boolean(text && text !== "-" && text !== "?");
+  };
+  const completedHistoryRows = [...winnersHistory].filter((row) =>
+    [row.guanabara, row.first, row.second, row.third, row.fourth].some(isValidPlacementName)
+  );
+
+  historyTable.innerHTML = completedHistoryRows
     .reverse()
     .map(
       (row) => `
@@ -2819,11 +2925,6 @@ function renderHistory() {
       `
     )
     .join("");
-
-  const isValidPlacementName = (value) => {
-    const text = String(value || "").trim();
-    return Boolean(text && text !== "-" && text !== "?");
-  };
 
   const parseGuanabaraWinners = (value) => {
     const text = String(value || "").trim();

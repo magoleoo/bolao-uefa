@@ -228,11 +228,11 @@ window.tournamentOutcomeFormsConfig = {
 };
 
 window.tournamentOutcomeManual = {
-  champion: "",
+  champion: "Paris Saint-Germain",
   scorer: "Kylian Mbappé",
-  assist: "",
-  updatedAt: "2026-05-06T22:00:00-03:00",
-  updatedBy: "Atualização manual do bolão",
+  assist: "Vinícius Jr.",
+  updatedAt: "2026-05-30T18:00:00-03:00",
+  updatedBy: "Atualização final do bolão",
   source: "manual",
 };
 
@@ -746,7 +746,8 @@ window.knockoutResults = [
     kickoff: "2026-05-30T13:00:00-03:00",
     homeTeam: "Paris Saint-Germain",
     awayTeam: "Arsenal",
-    scoreFinal: { home: null, away: null },
+    scoreFinal: { home: 1, away: 1 },
+    qualified: "Paris Saint-Germain",
   },
 ];
 
@@ -1013,7 +1014,7 @@ window.winnersHistory = [
   { season: "22/23", guanabara: "Leo Raposo", first: "Ranieri", second: "Leo Raposo", third: "Gui Giron", fourth: "Biel", participants: 20 },
   { season: "23/24", guanabara: "Felippe Leite", first: "Dan", second: "Serginho", third: "Michel", fourth: "Leo Raposo", participants: 20 },
   { season: "24/25", guanabara: "Leo Raposo", first: "Muca", second: "Leo Raposo", third: "Feijão", fourth: "Ranieri", participants: 20 },
-  { season: "25/26", guanabara: "Felippe Leite", first: "", second: "", third: "", fourth: "", participants: 21 },
+  { season: "25/26", guanabara: "Felippe Leite", first: "Gui Giron", second: "Scarpa", third: "Marcel", fourth: "Serginho", participants: 21 },
   { season: "26/27", guanabara: "", first: "", second: "", third: "", fourth: "", participants: 21 },
   { season: "27/28", guanabara: "", first: "", second: "", third: "", fourth: "", participants: 21 },
   { season: "28/29", guanabara: "", first: "", second: "", third: "", fourth: "", participants: 21 },
