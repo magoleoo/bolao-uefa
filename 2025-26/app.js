@@ -13,6 +13,7 @@ const {
   predictionHighlightsByMatchTitle,
   predictionsGallery,
   quarterFinalsFormsConfig,
+  finalPredictionRows,
   semiFinalsClassifiedRows,
   semiFinalsPredictionRows,
   tournamentOutcomeManual,
@@ -144,6 +145,7 @@ const semifinalPredictionRowsData = Array.isArray(semiFinalsPredictionRows)
 const semifinalClassifiedRowsData = Array.isArray(semiFinalsClassifiedRows)
   ? semiFinalsClassifiedRows
   : [];
+const finalPredictionRowsData = Array.isArray(finalPredictionRows) ? finalPredictionRows : [];
 
 function getParticipantById(id) {
   return participants.find((participant) => participant.id === id);
@@ -3647,6 +3649,13 @@ const sfClassifiedTies = [
   },
 ];
 
+const finalPredictionMatch = {
+  id: "F1",
+  home: "Paris Saint-Germain",
+  away: "Arsenal",
+  matchday: "Final",
+};
+
 function loadQfDrafts() {
   try {
     const raw = localStorage.getItem(storageKeys.qfDrafts);
@@ -4723,6 +4732,65 @@ function buildSemifinalPredictionFixturesFromManual() {
   return fixtures;
 }
 
+function buildFinalPredictionFixturesFromManual() {
+  const rows = extractSemifinalPredictionRows(finalPredictionRowsData);
+  if (!rows.length) return [];
+
+  const officialMatch = findKnockoutMatchByTeams(
+    "FINAL",
+    finalPredictionMatch.home,
+    finalPredictionMatch.away
+  );
+  const officialHome = parseIntegerScore(officialMatch?.scoreFinal?.home);
+  const officialAway = parseIntegerScore(officialMatch?.scoreFinal?.away);
+  const officialScore =
+    Number.isFinite(officialHome) && Number.isFinite(officialAway)
+      ? `${officialHome}x${officialAway}`
+      : "-";
+  const officialChampion =
+    String(officialMatch?.qualified || "").trim() ||
+    String(loadTournamentOutcome()?.champion || "").trim() ||
+    "-";
+
+  const scorePicks = [];
+  const championPicks = [];
+  rows.forEach((entry) => {
+    const predictedHome = parseIntegerScore(entry.row?.[`${finalPredictionMatch.id}_home`]);
+    const predictedAway = parseIntegerScore(entry.row?.[`${finalPredictionMatch.id}_away`]);
+    if (Number.isFinite(predictedHome) && Number.isFinite(predictedAway)) {
+      scorePicks.push({
+        participant: entry.participant,
+        pick: `${predictedHome}x${predictedAway}`,
+        rank_value: "",
+      });
+    }
+
+    const championPick = String(entry.row?.[`${finalPredictionMatch.id}_champion`] || "").trim();
+    if (championPick) {
+      championPicks.push({
+        participant: entry.participant,
+        pick: championPick,
+        rank_value: "",
+      });
+    }
+  });
+
+  return [
+    {
+      label: `${finalPredictionMatch.home} x ${finalPredictionMatch.away}`,
+      matchday: finalPredictionMatch.matchday,
+      official: officialScore,
+      picks: scorePicks,
+    },
+    {
+      label: `${finalPredictionMatch.home} x ${finalPredictionMatch.away}`,
+      matchday: "Campeão",
+      official: officialChampion,
+      picks: championPicks,
+    },
+  ];
+}
+
 function buildPredictionMatrixSection(fixtures, sectionTitle = "") {
   const knownParticipants = participants.map((participant) => participant.name);
   const knownParticipantsKeys = new Set(knownParticipants.map((name) => normalizeText(name)));
@@ -5470,6 +5538,11 @@ function renderPredictionConsultation() {
         rawFixtures = semifinalFixturesFromManual;
       } else if (!rawFixtures.length) {
         rawFixtures = backtestData?.phases?.SEMI?.fixtures || [];
+      }
+    } else if (activePredictionsPhase === "FINAL") {
+      const finalFixturesFromManual = buildFinalPredictionFixturesFromManual();
+      if (finalFixturesFromManual.length) {
+        rawFixtures = finalFixturesFromManual;
       }
     }
     if (hasKnockoutClassifiedSubview) {

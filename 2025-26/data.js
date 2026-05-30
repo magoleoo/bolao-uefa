@@ -176,6 +176,29 @@ window.semiFinalsClassifiedRows = [
   { Participante: "Deco", SF1_classificado: "Bayern de Munique", SF2_classificado: "Arsenal" },
 ];
 
+window.finalPredictionRows = [
+  { Timestamp: "2026-05-13T17:31:34-03:00", Email: "ranieri10@gmail.com", Participante: "Ranieri", F1_home: 3, F1_away: 3, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-26T16:19:01-03:00", Email: "felleite@gmail.com", Participante: "Felippe Leite", F1_home: 2, F1_away: 3, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-26T16:46:12-03:00", Email: "victor.soares@me.com", Participante: "Victor", F1_home: 1, F1_away: 3, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-28T17:48:33-03:00", Email: "rapasquali@gmail.com", Participante: "Rafinha", F1_home: 2, F1_away: 3, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-29T07:47:17-03:00", Email: "micviegas@gmail.com", Participante: "Michel", F1_home: 2, F1_away: 2, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-29T19:27:15-03:00", Email: "celsoribeiro44@gmail.com", Participante: "Celsinho", F1_home: 0, F1_away: 0, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-29T20:27:25-03:00", Email: "gui_giron@hotmail.com", Participante: "Gui Giron", F1_home: 2, F1_away: 0, F1_champion: "Paris Saint-Germain" },
+  { Timestamp: "2026-05-30T01:24:39-03:00", Email: "leoraposo@gmail.com", Participante: "Leo Raposo", F1_home: 2, F1_away: 2, F1_champion: "Paris Saint-Germain" },
+  { Timestamp: "2026-05-30T01:40:30-03:00", Email: "decarvalho.dan@gmail.com", Participante: "Dan", F1_home: 3, F1_away: 1, F1_champion: "Paris Saint-Germain" },
+  { Timestamp: "2026-05-30T02:42:26-03:00", Email: "ivanfarha@hotmail.com", Participante: "Ivan", F1_home: 2, F1_away: 2, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-30T02:56:44-03:00", Email: "leopicca@gmail.com", Participante: "Leo Picca", F1_home: 1, F1_away: 2, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-30T03:22:20-03:00", Email: "ascarpa2710@gmail.com", Participante: "Scarpa", F1_home: 1, F1_away: 1, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-30T05:24:58-03:00", Email: "marcelbuainain@gmail.com", Participante: "Marcel", F1_home: 2, F1_away: 0, F1_champion: "Paris Saint-Germain" },
+  { Timestamp: "2026-05-30T06:02:11-03:00", Email: "deco.fabricio5@gmail.com", Participante: "Deco", F1_home: 0, F1_away: 1, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-30T06:05:31-03:00", Email: "gmpicca@gmail.com", Participante: "Biel", F1_home: 1, F1_away: 2, F1_champion: "Arsenal" },
+  { Timestamp: "2026-05-30T07:00:04-03:00", Email: "enrico.vincioni@gmail.com", Participante: "Enrico", F1_home: 2, F1_away: 0, F1_champion: "Paris Saint-Germain" },
+  { Timestamp: "2026-05-30T07:16:00-03:00", Email: "sf2903@gmail.com", Participante: "Serginho", F1_home: 2, F1_away: 0, F1_champion: "Paris Saint-Germain" },
+  { Timestamp: "2026-05-30T07:36:34-03:00", Email: "mfmagini@gmail.com", Participante: "Muca", F1_home: 3, F1_away: 0, F1_champion: "Paris Saint-Germain" },
+  { Timestamp: "2026-05-30T07:40:29-03:00", Email: "gustavopstella@gmail.com", Participante: "Feijão", F1_home: 3, F1_away: 1, F1_champion: "Paris Saint-Germain" },
+  { Timestamp: "2026-05-30T08:34:18-03:00", Email: "danielgevaerd@hotmail.com", Participante: "Nanel", F1_home: 2, F1_away: 3, F1_champion: "Arsenal" },
+];
+
 window.supabaseShadowConfig = {
   enabled: false,
   url: "",
